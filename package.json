@@ -1,0 +1,16 @@
+{
+  "name": "verse-embedded",
+  "version": "1.0.0",
+  "description": "Lightweight library for embedding Verse artwork iframes",
+  "main": "dist/verse-embedded.js",
+  "types": "dist/verse-embedded.d.ts",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --outfile=dist/verse-embedded.js --minify --sourcemap",
+    "dev": "esbuild src/index.ts --bundle --outfile=dist/verse-embedded.js --sourcemap --watch",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "esbuild": "^0.19.12",
+    "typescript": "^5.3.3"
+  }
+} 
