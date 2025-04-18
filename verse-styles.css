@@ -1,0 +1,37 @@
+body {
+    min-height: unset !important;
+}
+
+[class*="HeaderContainer_root"] {
+    display: none !important;
+}
+
+[class*="ArtworkCover_root"] {
+    --wide-cover-max-height-desktop: 0px !important;
+}
+
+[class*="CollSinglePMSection_assetCoverRoot"] {
+    --forced-max-width: 200px !important;
+}
+
+[class*="CollSinglePMSection_baseframe"] {
+    min-height: 100px !important;
+}
+
+[class*="CollSinglePMSection_stickyContainer"] {
+    height: unset !important;
+    max-height: unset !important;
+    overflow: unset !important;
+}
+
+[class*="CollSMSection_baseframe"] {
+    display: none !important;
+}
+
+[class*="FooterContainer_footerWrapper"] {
+    display: none !important;
+}
+
+[class*="SwiperBasedSlider_swiperSlide"] {
+    height: 500px !important;
+}
