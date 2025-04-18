@@ -2,7 +2,7 @@
 
 Verse Embedded is a JavaScript library that helps you to integrate Verse Primary Market features into your existing websites.
 
-## Basic integra
+## Basic integration
 
 Add a script to your `<body>`:
 ```html

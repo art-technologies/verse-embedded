@@ -24,6 +24,7 @@ class VerseEmbed {
   private lastHeight: number = 0;
   private isFullScreenMode: boolean = false;
   private lastNormalHeight: number = 0;  // Store height before fullscreen
+  public iframe: HTMLIFrameElement | undefined;
 
   constructor(options: VerseEmbedOptions = {}) {
     this.baseUrl = options.baseUrl || 'https://verse-webapp-git-feat-verse-embedded-poc-at-verse.vercel.app/artworks';
@@ -162,7 +163,7 @@ class VerseEmbed {
     container.appendChild(loader);
 
     // Create iframe
-    const iframe = this.createIframe(artworkId);
+    this.iframe = this.createIframe(artworkId);
     
     // Load custom styles if specified
     const stylesPath = container.getAttribute('verse-custom-styles-path');
@@ -172,13 +173,17 @@ class VerseEmbed {
     }
 
     // Add iframe to container
-    container.appendChild(iframe);
+    container.appendChild(this.iframe);
 
     // Wait for iframe to load and apply styles
     await new Promise<void>((resolve) => {
-      iframe.onload = () => {
+      if (!this.iframe) {
+        return
+      }
+
+      this.iframe.onload = () => {
         if (customStyles) {
-          iframe.contentWindow?.postMessage({
+          this.iframe?.contentWindow?.postMessage({
             type: 'applyStyles',
             styles: customStyles
           }, new URL(this.baseUrl).origin);
@@ -196,8 +201,20 @@ class VerseEmbed {
     const containers = document.querySelectorAll<HTMLElement>('[verse-artwork-id]');
     containers.forEach(container => this.initializeContainer(container));
   }
+
+  public forceRefreshMeasure(): void {
+    if (!this.iframe) {
+      return
+    }
+
+    this.iframe.contentWindow?.postMessage({
+      type: "forceRefreshMeasure",
+    }, new URL(this.baseUrl).origin);
+  }
 }
 
 // Initialize automatically when script is loaded
 const verseEmbed = new VerseEmbed();
-verseEmbed.initialize(); 
+verseEmbed.initialize();
+
+(window as any).verseEmbed = verseEmbed;

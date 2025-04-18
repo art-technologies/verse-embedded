@@ -28,5 +28,5 @@
       width: 100%;
       min-height: ${this.minHeight}px;
       overflow: hidden;
-    `;let n=l();t.appendChild(n);let i=this.createIframe(e),s=t.getAttribute("verse-custom-styles-path"),r="";s&&(r=await this.loadCustomStyles(s)),t.appendChild(i),await new Promise(d=>{i.onload=()=>{r&&i.contentWindow?.postMessage({type:"applyStyles",styles:r},new URL(this.baseUrl).origin),t.removeChild(n),d()}})}initialize(){window.addEventListener("message",this.handleMessage),document.querySelectorAll("[verse-artwork-id]").forEach(e=>this.initializeContainer(e))}},c=new a;c.initialize();})();
+    `;let n=l();t.appendChild(n),this.iframe=this.createIframe(e);let i=t.getAttribute("verse-custom-styles-path"),s="";i&&(s=await this.loadCustomStyles(i)),t.appendChild(this.iframe),await new Promise(r=>{this.iframe&&(this.iframe.onload=()=>{s&&this.iframe?.contentWindow?.postMessage({type:"applyStyles",styles:s},new URL(this.baseUrl).origin),t.removeChild(n),r()})})}initialize(){window.addEventListener("message",this.handleMessage),document.querySelectorAll("[verse-artwork-id]").forEach(e=>this.initializeContainer(e))}forceRefreshMeasure(){this.iframe&&this.iframe.contentWindow?.postMessage({type:"forceRefreshMeasure"},new URL(this.baseUrl).origin)}},d=new a;d.initialize();window.verseEmbed=d;})();
 //# sourceMappingURL=verse-embedded.js.map
