@@ -18,6 +18,23 @@ type IFrameMessage = {
   styles: string;
 }
 
+const iframeSandox = [
+  "allow-downloads",
+  "allow-forms",
+  "allow-modals",
+  "allow-orientation-lock",
+  "allow-pointer-lock",
+  "allow-popups",
+  "allow-popups-to-escape-sandbox",
+  "allow-presentation",
+  "allow-same-origin",
+  "allow-scripts",
+  "allow-storage-access-by-user-activation",
+  // "allow-top-navigation",
+  // "allow-top-navigation-by-user-activation",
+  // "allow-top-navigation-to-custom-protocols",
+]
+
 class VerseEmbed {
   private baseUrl: string;
   private minHeight: number;
@@ -118,6 +135,7 @@ class VerseEmbed {
 
   private createIframe(artworkId: string): HTMLIFrameElement {
     const iframe = document.createElement('iframe');
+    iframe.setAttribute('sandbox', iframeSandox.join(" "));
     iframe.src = `${this.baseUrl}/${artworkId}?iframe=true`;
     iframe.style.cssText = `
       width: 100%;
