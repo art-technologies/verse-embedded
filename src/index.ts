@@ -161,6 +161,18 @@ class VerseEmbed {
     }
   }
 
+  public async applyStyles(styles: string): Promise<void> {
+    if (!this.iframe) {
+      console.error('No iframe found to apply styles to');
+      return;
+    }
+
+    this.iframe.contentWindow?.postMessage({
+      type: 'applyStyles',
+      styles
+    }, new URL(this.baseUrl).origin);
+  }
+
   private async initializeContainer(container: HTMLElement): Promise<void> {
     const artworkId = container.getAttribute('verse-artwork-id');
     if (!artworkId) {
@@ -199,12 +211,9 @@ class VerseEmbed {
         return
       }
 
-      this.iframe.onload = () => {
+      this.iframe.onload = async () => {
         if (customStyles) {
-          this.iframe?.contentWindow?.postMessage({
-            type: 'applyStyles',
-            styles: customStyles
-          }, new URL(this.baseUrl).origin);
+          await this.applyStyles(customStyles);
         }
         container.removeChild(loader);
         resolve();
