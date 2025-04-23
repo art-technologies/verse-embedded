@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verse Embedded Example</title>
+    <!-- Load the Verse Embedded library -->
+    <script src="dist/verse-embedded.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,17 +24,17 @@
         <span>This is some generic website content, below you can see the actual artwork embed</span>
     </header>
     
-    <!-- <div
+    <div
         class="artwork-container"
         verse-artwork-id="57883342-1032-4820-b318-b42fa761e1aa"
         verse-custom-styles-path="./verse-styles.css"
-    ></div> -->
+    ></div>
 
-    <div
+    <!-- <div
         class="artwork-container"
         verse-series-slug="internal-lullabies-for-the-disenfranchised"
         verse-custom-styles-path="./verse-styles.css"
-    ></div>
+    ></div> -->
     
     
     <footer style="padding: 20px;">
@@ -41,7 +43,11 @@
         <p>To get to the other side!</p>
     </footer>
 
-    <!-- Load the Verse Embedded library -->
-    <script src="dist/verse-embedded.js"></script>
+    <script>
+        const verseEmbed = new VerseEmbed({
+            baseUrl: "https://verse.works",
+        });
+        verseEmbed.initialize();
+    </script>
 </body>
 </html> 

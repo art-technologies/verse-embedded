@@ -4,9 +4,17 @@ Verse Embedded is a JavaScript library that helps you to integrate Verse Primary
 
 ## Basic integration
 
-Add a script to your `<body>`:
+Add a script to your `<head>`:
 ```html
 <script src="dist/verse-embedded.js"></script>
+```
+
+And add initialistion of library at the point when DOM is ready (in `example.html`, I did it in the bottom of body)
+```js
+const verseEmbed = new VerseEmbed({
+    baseUrl: "https://verse.works",
+});
+verseEmbed.initialize();
 ```
 
 Then, in add following div anywhere you want Verse artwork iframe to appear:

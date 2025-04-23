@@ -44,7 +44,10 @@ class VerseEmbed {
   public iframe: HTMLIFrameElement | undefined;
 
   constructor(options: VerseEmbedOptions = {}) {
-    this.baseUrl = options.baseUrl || 'https://verse-webapp-git-feat-verse-embedded-poc-at-verse.vercel.app';
+    if (!options.baseUrl) {
+      throw new Error('baseUrl is required');
+    }
+    this.baseUrl = options.baseUrl;
     this.minHeight = options.minHeight || 400;
     this.handleMessage = this.handleMessage.bind(this);
   }
@@ -248,7 +251,7 @@ class VerseEmbed {
 }
 
 // Initialize automatically when script is loaded
-const verseEmbed = new VerseEmbed();
-verseEmbed.initialize();
+// const verseEmbed = new VerseEmbed();
+// verseEmbed.initialize();
 
-(window as any).verseEmbed = verseEmbed;
+(window as any).VerseEmbed = VerseEmbed;
