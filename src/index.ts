@@ -44,7 +44,7 @@ class VerseEmbed {
   public iframe: HTMLIFrameElement | undefined;
 
   constructor(options: VerseEmbedOptions = {}) {
-    this.baseUrl = options.baseUrl || 'https://verse-webapp-git-feat-verse-embedded-poc-at-verse.vercel.app/artworks';
+    this.baseUrl = options.baseUrl || 'https://verse-webapp-git-feat-verse-embedded-poc-at-verse.vercel.app';
     this.minHeight = options.minHeight || 400;
     this.handleMessage = this.handleMessage.bind(this);
   }
@@ -133,10 +133,15 @@ class VerseEmbed {
     }
   }
 
-  private createIframe(artworkId: string): HTMLIFrameElement {
+  private createIframe(artworkId: string, seriesSlug?: string): HTMLIFrameElement {
     const iframe = document.createElement('iframe');
     iframe.setAttribute('sandbox', iframeSandox.join(" "));
-    iframe.src = `${this.baseUrl}/${artworkId}?iframe=true`;
+    
+    const url = seriesSlug 
+      ? `${this.baseUrl}/series/${seriesSlug}?iframe=true`
+      : `${this.baseUrl}/artworks/${artworkId}?iframe=true`;
+    
+    iframe.src = url;
     iframe.style.cssText = `
       width: 100%;
       height: 100%;
@@ -175,8 +180,10 @@ class VerseEmbed {
 
   private async initializeContainer(container: HTMLElement): Promise<void> {
     const artworkId = container.getAttribute('verse-artwork-id');
-    if (!artworkId) {
-      console.error('Container missing verse-artwork-id attribute');
+    const seriesSlug = container.getAttribute('verse-series-slug');
+    
+    if (!artworkId && !seriesSlug) {
+      console.error('Container missing required attributes: either verse-artwork-id or verse-series-slug must be provided');
       return;
     }
 
@@ -193,7 +200,7 @@ class VerseEmbed {
     container.appendChild(loader);
 
     // Create iframe
-    this.iframe = this.createIframe(artworkId);
+    this.iframe = this.createIframe(artworkId || '', seriesSlug || undefined);
     
     // Load custom styles if specified
     const stylesPath = container.getAttribute('verse-custom-styles-path');
@@ -225,7 +232,10 @@ class VerseEmbed {
     // Add message event listener
     window.addEventListener('message', this.handleMessage);
     
-    const containers = document.querySelectorAll<HTMLElement>('[verse-artwork-id]');
+    const containers = [
+      ...Array.from(document.querySelectorAll<HTMLElement>('[verse-artwork-id]')),
+      ...Array.from(document.querySelectorAll<HTMLElement>('[verse-series-slug]')),
+    ]
     containers.forEach(container => this.initializeContainer(container));
   }
 
