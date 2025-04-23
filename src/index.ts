@@ -50,7 +50,6 @@ class VerseEmbed {
   }
 
   private handleFullScreenMessage(isFullScreen: boolean, event: MessageEvent): void {
-    console.log('Received full screen message:', isFullScreen);
     this.isFullScreenMode = isFullScreen;
 
     // Find the iframe that sent the message
@@ -111,13 +110,11 @@ class VerseEmbed {
         if (sourceIframe) {
           const container = sourceIframe.parentElement;
           if (container) {
-            console.log('Received resize message:', message);
             // Only ensure minimum height
             const height = Math.max(message.bounds.height, this.minHeight);
 
             // Only update if height has changed
             if (this.lastHeight !== height) {
-              console.log('Updating iframe height to:', height);
               this.lastHeight = height;
               this.lastNormalHeight = height;  // Store the normal height
               container.style.height = `${height}px`;
