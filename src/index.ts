@@ -133,13 +133,13 @@ class VerseEmbed {
     }
   }
 
-  private createIframe(artworkId: string, seriesSlug?: string): HTMLIFrameElement {
+  private createIframe(artworkId: string, seriesSlug?: string, stylesPath?: string): HTMLIFrameElement {
     const iframe = document.createElement('iframe');
     iframe.setAttribute('sandbox', iframeSandox.join(" "));
     
     const url = seriesSlug 
-      ? `${this.baseUrl}/series/${seriesSlug}?iframe=true`
-      : `${this.baseUrl}/artworks/${artworkId}?iframe=true`;
+      ? `${this.baseUrl}/series/${seriesSlug}?iframe=true&stylesPath=${stylesPath}`
+      : `${this.baseUrl}/artworks/${artworkId}?iframe=true&stylesPath=${stylesPath}`;
     
     iframe.src = url;
     iframe.style.cssText = `
@@ -199,33 +199,36 @@ class VerseEmbed {
     const loader = createLoader();
     container.appendChild(loader);
 
+    // Get styles path
+    const stylesPath = container.getAttribute('verse-custom-styles-path');
+
     // Create iframe
-    this.iframe = this.createIframe(artworkId || '', seriesSlug || undefined);
+    this.iframe = this.createIframe(artworkId || '', seriesSlug || undefined, stylesPath || undefined);
     
     // Load custom styles if specified
-    const stylesPath = container.getAttribute('verse-custom-styles-path');
-    let customStyles = '';
-    if (stylesPath) {
-      customStyles = await this.loadCustomStyles(stylesPath);
-    }
+    // const stylesPath = container.getAttribute('verse-custom-styles-path');
+    // let customStyles = '';
+    // if (stylesPath) {
+    //   customStyles = await this.loadCustomStyles(stylesPath);
+    // }
 
     // Add iframe to container
     container.appendChild(this.iframe);
 
     // Wait for iframe to load and apply styles
-    await new Promise<void>((resolve) => {
-      if (!this.iframe) {
-        return
-      }
+    // await new Promise<void>((resolve) => {
+    //   if (!this.iframe) {
+    //     return
+    //   }
 
-      this.iframe.onload = async () => {
-        if (customStyles) {
-          await this.applyStyles(customStyles);
-        }
-        container.removeChild(loader);
-        resolve();
-      };
-    });
+      // this.iframe.onload = async () => {
+      //   if (customStyles) {
+      //     await this.applyStyles(customStyles);
+      //   }
+      //   container.removeChild(loader);
+      //   resolve();
+      // };
+    // });
   }
 
   public initialize(): void {
