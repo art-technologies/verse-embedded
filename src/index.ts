@@ -216,19 +216,19 @@ class VerseEmbed {
     container.appendChild(this.iframe);
 
     // Wait for iframe to load and apply styles
-    // await new Promise<void>((resolve) => {
-    //   if (!this.iframe) {
-    //     return
-    //   }
+    await new Promise<void>((resolve) => {
+      if (!this.iframe) {
+        return
+      }
 
-      // this.iframe.onload = async () => {
-      //   if (customStyles) {
-      //     await this.applyStyles(customStyles);
-      //   }
-      //   container.removeChild(loader);
-      //   resolve();
-      // };
-    // });
+      this.iframe.onload = async () => {
+        // if (customStyles) {
+        //   await this.applyStyles(customStyles);
+        // }
+        container.removeChild(loader);
+        resolve();
+      };
+    });
   }
 
   public initialize(): void {
