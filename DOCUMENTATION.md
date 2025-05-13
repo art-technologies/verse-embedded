@@ -21,7 +21,7 @@ Then, in add following div anywhere you want Verse artwork iframe to appear:
 ```html
 <div
     verse-artwork-id="57883342-1032-4820-b318-b42fa761e1aa"
-    verse-custom-styles-path="./verse-styles.css"
+    verse-custom-styles-path="http://localhost:3000/verse-styles.css"
 ></div>
 ```
 where
@@ -39,4 +39,12 @@ use following CSS rules:
 [class*="CollSinglePMSection_assetCoverRoot"] {
     --forced-max-width: 200px !important;
 }
+```
+
+## Local testing
+
+To test locally use command below
+
+```bash
+npm run serve
 ```
