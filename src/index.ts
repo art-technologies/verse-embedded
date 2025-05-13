@@ -48,7 +48,7 @@ class VerseEmbed {
       throw new Error('baseUrl is required');
     }
     this.baseUrl = options.baseUrl;
-    this.minHeight = options.minHeight || 400;
+    this.minHeight = options.minHeight || 560;
     this.handleMessage = this.handleMessage.bind(this);
   }
 
