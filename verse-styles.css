@@ -6,7 +6,7 @@ body {
     display: none !important;
 }
 
-[class*="ArtworkCover_root"] {
+/* [class*="ArtworkCover_root"] {
     --wide-cover-max-height-desktop: 0px !important;
 }
 
@@ -26,7 +26,7 @@ body {
 
 [class*="CollSMSection_baseframe"] {
     display: none !important;
-}
+} */
 
 [class*="FooterContainer_footerWrapper"] {
     display: none !important;

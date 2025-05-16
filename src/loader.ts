@@ -29,5 +29,6 @@ export const createLoader = (): HTMLElement => {
 
   document.head.appendChild(style);
   loader.appendChild(spinner);
+  
   return loader;
 }; 

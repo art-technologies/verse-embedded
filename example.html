@@ -27,6 +27,7 @@
     <div
         class="artwork-container"
         verse-artwork-id="57883342-1032-4820-b318-b42fa761e1aa"
+        verse-edition-number="1"
         verse-custom-styles-path="http://localhost:3000/verse-styles.css"
     ></div>
 
@@ -46,8 +47,9 @@
     <script>
         const verseEmbed = new VerseEmbed({
             // temporary URL for testing the latest features
+            baseUrl: "http://localhost:3001",
             // baseUrl: "https://verse-webapp-git-fix-ver-3135-help-external-dev-47b7ac-at-verse.vercel.app",
-            baseUrl: "https://verse.works",
+            // baseUrl: "https://verse.works",
         });
         verseEmbed.initialize();
     </script>

@@ -133,13 +133,13 @@ class VerseEmbed {
     }
   }
 
-  private createIframe(artworkId: string, seriesSlug?: string, stylesPath?: string): HTMLIFrameElement {
+  private createIframe({artworkId, editionNumber, seriesSlug, stylesPath }: {artworkId: string, seriesSlug?: string, editionNumber?: string, stylesPath?: string}): HTMLIFrameElement {
     const iframe = document.createElement('iframe');
     iframe.setAttribute('sandbox', iframeSandox.join(" "));
-    
+
     const url = seriesSlug 
       ? `${this.baseUrl}/series/${seriesSlug}?iframe=true&stylesPath=${stylesPath}`
-      : `${this.baseUrl}/artworks/${artworkId}?iframe=true&stylesPath=${stylesPath}`;
+      : `${this.baseUrl}/artworks/${artworkId}${editionNumber ? '/' + editionNumber : ""}?iframe=true&stylesPath=${stylesPath}`;
     
     iframe.src = url;
     iframe.style.cssText = `
@@ -147,9 +147,9 @@ class VerseEmbed {
       height: 100%;
       border: none;
       overflow: hidden;
-      scrolling: no;
     `;
     iframe.setAttribute('scrolling', 'no');
+    
     return iframe;
   }
 
@@ -179,11 +179,18 @@ class VerseEmbed {
   }
 
   private async initializeContainer(container: HTMLElement): Promise<void> {
-    const artworkId = container.getAttribute('verse-artwork-id');
-    const seriesSlug = container.getAttribute('verse-series-slug');
+    const attributeName = {
+      artwork: 'verse-artwork-id',
+      edition: 'verse-edition-number',
+      serie: 'verse-series-slug',
+    }
+
+    const artworkId = container.getAttribute(attributeName.artwork);
+    const editionNumber = container.getAttribute(attributeName.edition);
+    const seriesSlug = container.getAttribute(attributeName.serie);
     
-    if (!artworkId && !seriesSlug) {
-      console.error('Container missing required attributes: either verse-artwork-id or verse-series-slug must be provided');
+    if (!artworkId && !seriesSlug && !editionNumber) {
+      console.error(`Container missing required attributes: either ${attributeName.artwork} or ${attributeName.serie} must be provided`);
       return;
     }
 
@@ -203,7 +210,12 @@ class VerseEmbed {
     const stylesPath = container.getAttribute('verse-custom-styles-path');
 
     // Create iframe
-    this.iframe = this.createIframe(artworkId || '', seriesSlug || undefined, stylesPath || undefined);
+    this.iframe = this.createIframe({
+      artworkId: artworkId || '',
+      editionNumber: editionNumber || undefined,
+      seriesSlug: seriesSlug || undefined,
+      stylesPath: stylesPath || undefined
+    });
     
     // Load custom styles if specified
     // const stylesPath = container.getAttribute('verse-custom-styles-path');

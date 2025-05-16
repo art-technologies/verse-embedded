@@ -22,10 +22,12 @@ Then, in add following div anywhere you want Verse artwork iframe to appear:
 <div
     verse-artwork-id="57883342-1032-4820-b318-b42fa761e1aa"
     verse-custom-styles-path="http://localhost:3000/verse-styles.css"
+    verse-edition-number="1"
 ></div>
 ```
 where
 - `verse-artwork-id` is a inner Verse artwork id, should be provided by Verse team
+- `verse-edition-number` is a inner Verse edition number, should be provided by Verse team
 - `verse-custom-styles-path` is a relative or absolute path to CSS file you wish to use in order to override Verse default styles
 
 ## Origin allowlist
