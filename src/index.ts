@@ -67,20 +67,22 @@ class VerseEmbed {
         if (isFullScreen) {
           // Store the current height before going fullscreen
           this.lastNormalHeight = this.lastHeight;
-          
+
           // Set fullscreen styles
+          sourceIframe.style.height = '100%';
+          
           container.style.position = 'fixed';
-          container.style.top = '0';
-          container.style.left = '0';
-          container.style.width = '100vw';
-          container.style.height = '100vh';
+          container.style.inset = '0';
+          container.style.width = '100%';
+          container.style.height = '100%';
           container.style.zIndex = '9999';
-          container.style.backgroundColor = 'white';
+          container.style.backgroundColor = '#fff';
         } else {
           // Reset to initial state
+          sourceIframe.style.height = `${this.lastNormalHeight}px`;
+
           container.style.position = 'relative';
-          container.style.top = '';
-          container.style.left = '';
+          container.style.inset = '';
           container.style.width = '100%';
           container.style.height = `${this.lastNormalHeight}px`;  // Restore the stored height
           container.style.zIndex = '';

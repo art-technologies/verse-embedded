@@ -2,7 +2,8 @@ body {
     min-height: unset !important;
 }
 
-[class*="HeaderContainer_root"] {
+.verse-header,
+.verse-footer {
     display: none !important;
 }
 
