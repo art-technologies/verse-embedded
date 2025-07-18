@@ -17,16 +17,14 @@ type IFrameMessage = {
   type: 'applyStyles';
   styles: string;
 }
-
+// Error while parsing the 'sandbox' attribute: 'allow-orientation-lock', 'allow-presentation' are invalid sandbox flags.
 const iframeSandox = [
   "allow-downloads",
   "allow-forms",
   "allow-modals",
-  "allow-orientation-lock",
   "allow-pointer-lock",
   "allow-popups",
   "allow-popups-to-escape-sandbox",
-  "allow-presentation",
   "allow-same-origin",
   "allow-scripts",
   "allow-storage-access-by-user-activation",

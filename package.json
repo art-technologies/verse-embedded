@@ -7,7 +7,7 @@
   "scripts": {
     "build": "esbuild src/index.ts --bundle --outfile=dist/verse-embedded.js --minify --sourcemap",
     "dev": "esbuild src/index.ts --bundle --outfile=dist/verse-embedded.js --sourcemap --watch",
-    "serve": "DEV_SERVER_PORT=3000 DEV_SERVER_ROOT=. dev-server",
+    "serve": "DEV_SERVER_PORT=3001 DEV_SERVER_ROOT=. dev-server",
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
