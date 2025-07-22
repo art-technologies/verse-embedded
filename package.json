@@ -5,14 +5,21 @@
   "main": "dist/verse-embedded.js",
   "types": "dist/verse-embedded.d.ts",
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --outfile=dist/verse-embedded.js --minify --sourcemap",
-    "dev": "esbuild src/index.ts --bundle --outfile=dist/verse-embedded.js --sourcemap --watch",
-    "serve": "DEV_SERVER_PORT=3001 DEV_SERVER_ROOT=. dev-server",
+    "build": "esbuild src/index.ts --bundle --outfile=dist/verse-embedded.js --outfile=public/verse-embedded.js --minify --sourcemap",
+    "dev": "esbuild src/index.ts --bundle --outfile=dist/verse-embedded.js --outfile=public/verse-embedded.js --sourcemap --watch",
+    "serve": "next dev --port 3001 --experimental-https --turbopack",
     "type-check": "tsc --noEmit"
   },
+  "dependencies": {
+    "next": "^15.4.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
   "devDependencies": {
-    "dev-server": "^0.2.0",
+    "@types/node": "24.1.0",
+    "@types/react": "19.1.8",
     "esbuild": "^0.19.12",
     "typescript": "^5.3.3"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

@@ -2,3 +2,8 @@
 
 node_modules
 dist
+certificates
+
+.next
+public/*.js
+public/*.js.map
