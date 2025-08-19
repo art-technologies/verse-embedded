@@ -16,6 +16,8 @@ type IFrameMessage = {
 } | {
   type: 'applyStyles';
   styles: string;
+} | {
+  type: 'triggerSignInRedirect';
 }
 // Error while parsing the 'sandbox' attribute: 'allow-orientation-lock', 'allow-presentation' are invalid sandbox flags.
 const iframeSandox = [
@@ -127,6 +129,8 @@ class VerseEmbed {
         }
       } else if (message.type === 'fullScreenMode' && typeof message.fullScreen === 'boolean') {
         this.handleFullScreenMessage(message.fullScreen, event);
+      } else if (message.type === 'triggerSignInRedirect') {
+        window.location.href = `${this.baseUrl}/signin?iframe=true&redirectUrl=${encodeURIComponent(window.location.href)}`
       }
     } catch (e) {
       console.error('Error handling iframe message:', e);
