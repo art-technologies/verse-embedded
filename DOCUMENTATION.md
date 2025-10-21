@@ -54,8 +54,11 @@ where
 - In order to make it avaiable on your website, please chat with Verse tech team and give them your origin needed for whitelisting
 
 ## Comments on custom CSS
-Because Verse use build system, classnames may have have postfixes that are not known in advance. Thus, in current version you should
-use following CSS rules:
+Because Verse uses a build system, class names may include postfixes that are not known in advance. Therefore, in the current version, 
+you should target elements using partial class name matches. 
+
+For example:
+
 ```css
 [class*="CollSinglePMSection_assetCoverRoot"] {
     --forced-max-width: 200px !important;
