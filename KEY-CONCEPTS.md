@@ -31,3 +31,7 @@ A primary market (PM) sale is a sale from which collectors can purchase editions
 PM sales are configured for artworks. 
 
 When a collector make a purchase from a PM sale, they receive an edition.
+
+### Projects & sale types
+
+Please refer to https://docs.verse.works/docs/intro to learn more about project types, sale types, smart contracts and more.
