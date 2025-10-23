@@ -17,9 +17,19 @@ const verseEmbed = new VerseEmbed({
 verseEmbed.initialize();
 ```
 
-Then, in add following div anywhere you want Verse artwork/edition/serie iframe to appear:
+Then, in add following div anywhere you want Verse series/artwork/edition iframe to appear:
 
-### Loading artworks
+### Load a series `Recommended`
+
+
+```html
+<div
+    verse-series-slug="internal-lullabies-for-the-disenfranchised"
+    verse-custom-styles-path="http://localhost:3000/verse-styles.css"
+></div>
+```
+
+### Load an artwork
 ```html
 <div
     verse-artwork-id="57883342-1032-4820-b318-b42fa761e1aa"
@@ -27,7 +37,7 @@ Then, in add following div anywhere you want Verse artwork/edition/serie iframe 
 ></div>
 ```
 
-### Loading editions
+### Load an edition
 ```html
 <div
     verse-artwork-id="57883342-1032-4820-b318-b42fa761e1aa"
@@ -36,13 +46,6 @@ Then, in add following div anywhere you want Verse artwork/edition/serie iframe 
 ></div>
 ```
 
-### Loading series (collections)
-```html
-<div
-    verse-series-slug="internal-lullabies-for-the-disenfranchised"
-    verse-custom-styles-path="http://localhost:3000/verse-styles.css"
-></div>
-```
 where
 - `verse-artwork-id` is a inner Verse artwork id, should be provided by Verse team
 - `verse-edition-number` is a inner Verse edition number, should be provided by Verse team
