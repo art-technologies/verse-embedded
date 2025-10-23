@@ -19,7 +19,7 @@ verseEmbed.initialize();
 
 Then, in add following div anywhere you want Verse series/artwork/edition iframe to appear:
 
-### Load a series `Recommended`
+### Load a series (Recommended)
 
 
 ```html
