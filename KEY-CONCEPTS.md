@@ -1,5 +1,18 @@
 # Key concepts
 
+```mermaid
+graph LR
+  SERIES["Series"] -->|contains| ARTWORK["Artwork"]
+  ARTWORK -->|contains| EDITION["Edition"]
+  ARTWORK -->|has| PM_SALE["Primary Market Sale"]
+  PM_SALE -->|delivers on purchase| EDITION
+
+  %% Optional styling
+  classDef entity fill:#f8f8ff,stroke:#555,stroke-width:1px;
+  class SERIES,ARTWORK,EDITION,PM_SALE entity;
+```
+
+
 ### Edition
 
 An edition is an NFT. 
@@ -25,6 +38,7 @@ If no child artworks have an upcoming or active primary market sale, only a grid
 We recommend embedding series instead of artworks wherever possible. 
 
 
+
 ### Primary market sale
 
 A primary market (PM) sale is a sale from which collectors can purchase editions from the artist and/or gallery.
@@ -36,37 +50,4 @@ When a collector make a purchase from a PM sale, they receive an edition.
 ### Projects & sale types
 
 Please refer to https://docs.verse.works/docs/intro to learn more about project types, sale types, smart contracts and more.
-
----
-
-## Diagrams
-
-```mermaid
-graph LR
-  SERIES["Series"] -->|contains| ARTWORK["Artwork"]
-  ARTWORK -->|contains| EDITION["Edition"]
-  ARTWORK -->|has| PM_SALE["Primary Market Sale"]
-  PM_SALE -->|delivers on purchase| EDITION
-
-  %% Optional styling
-  classDef entity fill:#f8f8ff,stroke:#555,stroke-width:1px;
-  class SERIES,ARTWORK,EDITION,PM_SALE entity;
-```
-
-```mermaid
-flowchart TD
-  A[Series page loaded] --> B{Any artworks with<br/>active or upcoming PM sale?}
-  B -- Yes --> C{How many such artworks?}
-  C -- 1 --> D[Display that PM sale at the top]
-  C -- >1 --> E[Display a grid of those artworks at the top]
-  B -- No --> F[No PM sale section at the top]
-  D --> G{Do any child artworks have editions?}
-  E --> G
-  F --> G
-  G -- Yes --> H[Show a grid of editions below the top section]
-  G -- No --> I[No editions grid shown]
-  B -- No & G==Yes --> J[Only a grid of editions is displayed]
-  N([Recommendation: Embed SERIES rather than individual ARTWORK pages where possible])
-
-```
 
