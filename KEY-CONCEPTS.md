@@ -12,16 +12,13 @@ graph LR
   class SERIES,ARTWORK,EDITION,PM_SALE entity;
 ```
 
-
 ### Edition
 
-An edition is an NFT. 
-
+An edition is an NFT.
 
 ### Artwork
 
 An artwork is a container for editions and can host a primary market sale.
-
 
 ### Series
 
@@ -35,19 +32,16 @@ If any child artworks contain any editions, a grid of editions is displayed belo
 
 If no child artworks have an upcoming or active primary market sale, only a grid of editions is displayed ([example](https://verse.works/series/fields-by-erik-swahn)).
 
-We recommend embedding series instead of artworks wherever possible. 
-
-
+We recommend embedding series instead of artworks wherever possible.
 
 ### Primary market sale
 
 A primary market (PM) sale is a sale from which collectors can purchase editions from the artist and/or gallery.
 
-PM sales are configured for artworks. 
+PM sales are configured for artworks.
 
 When a collector make a purchase from a PM sale, they receive an edition.
 
 ### Projects & sale types
 
 Please refer to https://docs.verse.works/docs/intro to learn more about project types, sale types, smart contracts and more.
-

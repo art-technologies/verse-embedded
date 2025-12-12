@@ -5,14 +5,16 @@ Verse Embedded is a JavaScript library that helps you to integrate Verse Primary
 ## Basic integration
 
 Add a script to your `<head>`:
+
 ```html
 <script src="dist/verse-embedded.js"></script>
 ```
 
 And add initialistion of library at the point when DOM is ready (in `example.html`, I did it in the bottom of body)
+
 ```js
 const verseEmbed = new VerseEmbed({
-    baseUrl: "https://verse.works",
+  baseUrl: "https://verse.works",
 });
 verseEmbed.initialize();
 ```
@@ -21,50 +23,54 @@ Then, in add following div anywhere you want Verse series/artwork/edition iframe
 
 ### Load a series (Recommended)
 
-
 ```html
 <div
-    verse-series-slug="internal-lullabies-for-the-disenfranchised"
-    verse-custom-styles-path="http://localhost:3000/verse-styles.css"
+  verse-series-slug="internal-lullabies-for-the-disenfranchised"
+  verse-custom-styles-path="http://localhost:3000/verse-styles.css"
 ></div>
 ```
 
 ### Load an artwork
+
 ```html
 <div
-    verse-artwork-id="57883342-1032-4820-b318-b42fa761e1aa"
-    verse-custom-styles-path="http://localhost:3000/verse-styles.css"
+  verse-artwork-id="57883342-1032-4820-b318-b42fa761e1aa"
+  verse-custom-styles-path="http://localhost:3000/verse-styles.css"
 ></div>
 ```
 
 ### Load an edition
+
 ```html
 <div
-    verse-artwork-id="57883342-1032-4820-b318-b42fa761e1aa"
-    verse-edition-number="1"
-    verse-custom-styles-path="http://localhost:3000/verse-styles.css"
+  verse-artwork-id="57883342-1032-4820-b318-b42fa761e1aa"
+  verse-edition-number="1"
+  verse-custom-styles-path="http://localhost:3000/verse-styles.css"
 ></div>
 ```
 
 where
+
 - `verse-artwork-id` is a inner Verse artwork id, should be provided by Verse team
 - `verse-edition-number` is a inner Verse edition number, should be provided by Verse team
 - `verse-series-slug` is a inner Verse serie's slug, should be provided by Verse team
 - `verse-custom-styles-path` is a relative or absolute path to CSS file you wish to use in order to override Verse default styles
 
 ## Origin allowlist
+
 - You can embed Verse iframe only on `localhost:3000` origin
 - In order to make it avaiable on your website, please chat with Verse tech team and give them your origin needed for whitelisting
 
 ## Comments on custom CSS
-Because Verse uses a build system, class names may include postfixes that are not known in advance. Therefore, in the current version, 
-you should target elements using partial class name matches. 
+
+Because Verse uses a build system, class names may include postfixes that are not known in advance. Therefore, in the current version,
+you should target elements using partial class name matches.
 
 For example:
 
 ```css
 [class*="CollSinglePMSection_assetCoverRoot"] {
-    --forced-max-width: 200px !important;
+  --forced-max-width: 200px !important;
 }
 ```
 

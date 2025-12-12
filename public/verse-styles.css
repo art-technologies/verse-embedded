@@ -1,10 +1,11 @@
 body {
-    min-height: unset !important;
+  min-height: unset !important;
+  color: red;
 }
 
 .verse-header,
 .verse-footer {
-    display: none !important;
+  display: none !important;
 }
 
 /* [class*="ArtworkCover_root"] {
@@ -30,9 +31,9 @@ body {
 } */
 
 [class*="FooterContainer_footerWrapper"] {
-    display: none !important;
+  display: none !important;
 }
 
 [class*="SwiperBasedSlider_swiperSlide"] {
-    height: 500px !important;
+  height: 500px !important;
 }

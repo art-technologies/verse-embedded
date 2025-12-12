@@ -1,34 +1,36 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Verse Embedded Example</title>
     <!-- Load the Verse Embedded library -->
     <script src="dist/verse-embedded.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 0;
-            margin: 0;
-        }
-        .artwork-container {
-            margin: 20px 0;
-            height: 900px;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        padding: 0;
+        margin: 0;
+      }
+      .artwork-container {
+        margin: 20px 0;
+        height: 900px;
+      }
     </style>
-</head>
-<body>
-    <header style="padding: 20px;">
-        <h1>Verse Artwork Embed Example</h1>
-        <span>This is some generic website content, below you can see the actual artwork embed</span>
+  </head>
+  <body>
+    <header style="padding: 20px">
+      <h1>Verse Artwork Embed Example</h1>
+      <span
+        >This is some generic website content, below you can see the actual
+        artwork embed</span
+      >
     </header>
-    
+
     <div
-        class="artwork-container"
-        verse-artwork-id="329d1517-99fd-4350-9b6e-2e7687548080"
-        verse-edition-number="18"
-        verse-custom-styles-path="http://localhost:3001/verse-styles.css"
+      class="artwork-container"
+      verse-series-slug="collection-with-multiple-pm-artworks-by-test01234"
+      verse-custom-styles-path="http://localhost:3001/verse-styles.css"
     ></div>
 
     <!-- <div
@@ -36,22 +38,21 @@
         verse-series-slug="internal-lullabies-for-the-disenfranchised"
         verse-custom-styles-path="./verse-styles.css"
     ></div> -->
-    
-    
-    <footer style="padding: 20px;">
-        <p>Fun footer, tell a joke:</p>
-        <p>Why did the chicken cross the road?</p>
-        <p>To get to the other side!</p>
+
+    <footer style="padding: 20px">
+      <p>Fun footer, tell a joke:</p>
+      <p>Why did the chicken cross the road?</p>
+      <p>To get to the other side!</p>
     </footer>
 
     <script>
-        const verseEmbed = new VerseEmbed({
-            // temporary URL for testing the latest features
-            // baseUrl: "http://localhost:3000",
-            baseUrl: "https://verse-webapp-git-fix-ver-3392-you-shouldnt-be-d-6cb319-at-verse.vercel.app/",
-            // baseUrl: "https://verse.works",
-        });
-        verseEmbed.initialize();
+      const verseEmbed = new VerseEmbed({
+        // temporary URL for testing the latest features
+        baseUrl: "http://localhost:3000",
+        // baseUrl: "https://verse-webapp-git-fix-ver-3392-you-shouldnt-be-d-6cb319-at-verse.vercel.app/",
+        // baseUrl: "https://verse.works",
+      });
+      verseEmbed.initialize();
     </script>
-</body>
-</html> 
+  </body>
+</html>

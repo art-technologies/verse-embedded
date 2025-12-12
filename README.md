@@ -5,12 +5,14 @@ A lightweight library for embedding Verse artwork iframes on any website.
 ## Installation
 
 1. Build the library:
+
 ```bash
 npm install
 npm run build
 ```
 
 2. Include the built script in your HTML:
+
 ```html
 <script src="path/to/verse-embedded.js"></script>
 ```
@@ -18,6 +20,7 @@ npm run build
 ## Usage
 
 1. Add a container div with the `verse-artwork-id` attribute:
+
 ```html
 <div verse-artwork-id="123"></div>
 ```
@@ -34,7 +37,7 @@ You can customize the base URL by creating a new instance of VerseEmbed:
 
 ```javascript
 const verseEmbed = new VerseEmbed({
-  baseUrl: 'https://custom-verse-url.com/artworks'
+  baseUrl: "https://custom-verse-url.com/artworks",
 });
 verseEmbed.initialize();
 ```
@@ -48,4 +51,4 @@ verseEmbed.initialize();
 ## Requirements
 
 - Modern browser with ES2020 support
-- TypeScript 5.3.3 or higher (for development) 
+- TypeScript 5.3.3 or higher (for development)

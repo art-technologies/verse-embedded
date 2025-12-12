@@ -1,5 +1,5 @@
 export const createLoader = (): HTMLElement => {
-  const loader = document.createElement('div');
+  const loader = document.createElement("div");
   loader.style.cssText = `
     display: flex;
     align-items: center;
@@ -9,7 +9,7 @@ export const createLoader = (): HTMLElement => {
     background: #f5f5f5;
   `;
 
-  const spinner = document.createElement('div');
+  const spinner = document.createElement("div");
   spinner.style.cssText = `
     width: 40px;
     height: 40px;
@@ -19,7 +19,7 @@ export const createLoader = (): HTMLElement => {
     animation: spin 1s linear infinite;
   `;
 
-  const style = document.createElement('style');
+  const style = document.createElement("style");
   style.textContent = `
     @keyframes spin {
       0% { transform: rotate(0deg); }
@@ -29,6 +29,6 @@ export const createLoader = (): HTMLElement => {
 
   document.head.appendChild(style);
   loader.appendChild(spinner);
-  
+
   return loader;
-}; 
+};
