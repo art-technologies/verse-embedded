@@ -14,7 +14,7 @@ And add initialistion of library at the point when DOM is ready (in `example.htm
 
 ```js
 const verseEmbed = new VerseEmbed({
-  baseUrl: "https://verse.works",
+  baseUrl: "https://iframe.verse.works",
 });
 verseEmbed.initialize();
 ```

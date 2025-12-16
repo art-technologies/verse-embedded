@@ -29,8 +29,8 @@ export default function Page() {
         {`
                     const verseEmbed = new VerseEmbed({
                         // temporary URL for testing the latest features
-                        baseUrl: "https://localhost:3000",
-                        // baseUrl: "https://verse.works",
+                        // baseUrl: "https://localhost:3000",
+                        baseUrl: "https://iframe.verse.works",
                     });
                     verseEmbed.initialize();
                 `}
