@@ -8,18 +8,24 @@
     "build": "esbuild src/index.ts --bundle --outfile=dist/verse-embedded.js --outfile=public/verse-embedded.js --minify --sourcemap",
     "dev": "esbuild src/index.ts --bundle --outfile=dist/verse-embedded.js --outfile=public/verse-embedded.js --sourcemap --watch",
     "serve": "next dev --port 3001 --experimental-https --turbopack",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "prepare": "husky"
   },
   "dependencies": {
-    "next": "^15.4.3",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "next": "^16.0.10",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
   },
   "devDependencies": {
     "@types/node": "24.1.0",
-    "@types/react": "19.1.8",
-    "esbuild": "^0.19.12",
-    "typescript": "^5.3.3"
+    "@types/react": "19.2.7",
+    "esbuild": "^0.27.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "3.7.4",
+    "typescript": "^5.9.3"
   },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
+  }
 }

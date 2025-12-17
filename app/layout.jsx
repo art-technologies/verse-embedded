@@ -1,4 +1,4 @@
-import Script from 'next/script'
+import Script from "next/script";
 
 export default function RootLayout({ children }) {
   return (
@@ -8,5 +8,5 @@ export default function RootLayout({ children }) {
         <Script src="/verse-embedded.js" strategy="beforeInteractive"></Script>
       </body>
     </html>
-  )
+  );
 }

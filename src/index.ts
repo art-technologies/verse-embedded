@@ -1,24 +1,28 @@
-import { createLoader } from './loader';
+import { createLoader } from "./loader";
 
 interface VerseEmbedOptions {
   baseUrl?: string;
   minHeight?: number;
 }
 
-type IFrameMessage = {
-  type: 'resize';
-  bounds: {
-    height: number;
-  };
-} | {
-  type: 'fullScreenMode';
-  fullScreen: boolean;
-} | {
-  type: 'applyStyles';
-  styles: string;
-} | {
-  type: 'triggerSignInRedirect';
-}
+type IFrameMessage =
+  | {
+      type: "resize";
+      bounds: {
+        height: number;
+      };
+    }
+  | {
+      type: "fullScreenMode";
+      fullScreen: boolean;
+    }
+  | {
+      type: "applyStyles";
+      styles: string;
+    }
+  | {
+      type: "triggerSignInRedirect";
+    };
 // Error while parsing the 'sandbox' attribute: 'allow-orientation-lock', 'allow-presentation' are invalid sandbox flags.
 const iframeSandox = [
   "allow-downloads",
@@ -33,32 +37,35 @@ const iframeSandox = [
   // "allow-top-navigation",
   // "allow-top-navigation-by-user-activation",
   // "allow-top-navigation-to-custom-protocols",
-]
+];
 
 class VerseEmbed {
   private baseUrl: string;
   private minHeight: number;
   private lastHeight: number = 0;
   private isFullScreenMode: boolean = false;
-  private lastNormalHeight: number = 0;  // Store height before fullscreen
+  private lastNormalHeight: number = 0; // Store height before fullscreen
   public iframe: HTMLIFrameElement | undefined;
 
   constructor(options: VerseEmbedOptions = {}) {
     if (!options.baseUrl) {
-      throw new Error('baseUrl is required');
+      throw new Error("baseUrl is required");
     }
     this.baseUrl = options.baseUrl;
     this.minHeight = options.minHeight || 480;
     this.handleMessage = this.handleMessage.bind(this);
   }
 
-  private handleFullScreenMessage(isFullScreen: boolean, event: MessageEvent): void {
+  private handleFullScreenMessage(
+    isFullScreen: boolean,
+    event: MessageEvent,
+  ): void {
     this.isFullScreenMode = isFullScreen;
 
     // Find the iframe that sent the message
-    const iframes = document.querySelectorAll('iframe');
-    const sourceIframe = Array.from(iframes).find(iframe => 
-      iframe.contentWindow === event.source
+    const iframes = document.querySelectorAll("iframe");
+    const sourceIframe = Array.from(iframes).find(
+      (iframe) => iframe.contentWindow === event.source,
     );
 
     if (sourceIframe) {
@@ -69,24 +76,24 @@ class VerseEmbed {
           this.lastNormalHeight = this.lastHeight;
 
           // Set fullscreen styles
-          sourceIframe.style.height = '100%';
-          
-          container.style.position = 'fixed';
-          container.style.inset = '0';
-          container.style.width = '100%';
-          container.style.height = '100%';
-          container.style.zIndex = '9999';
-          container.style.backgroundColor = '#fff';
+          sourceIframe.style.height = "100%";
+
+          container.style.position = "fixed";
+          container.style.inset = "0";
+          container.style.width = "100%";
+          container.style.height = "100%";
+          container.style.zIndex = "9999";
+          container.style.backgroundColor = "#fff";
         } else {
           // Reset to initial state
           sourceIframe.style.height = `${this.lastNormalHeight}px`;
 
-          container.style.position = 'relative';
-          container.style.inset = '';
-          container.style.width = '100%';
-          container.style.height = `${this.lastNormalHeight}px`;  // Restore the stored height
-          container.style.zIndex = '';
-          container.style.backgroundColor = '';
+          container.style.position = "relative";
+          container.style.inset = "";
+          container.style.width = "100%";
+          container.style.height = `${this.lastNormalHeight}px`; // Restore the stored height
+          container.style.zIndex = "";
+          container.style.backgroundColor = "";
         }
       }
     }
@@ -100,18 +107,18 @@ class VerseEmbed {
 
     try {
       const message: IFrameMessage = event.data;
-      if (message.type === 'resize') {
+      if (message.type === "resize") {
         // Ignore resize events during fullscreen mode
         if (this.isFullScreenMode) {
           return;
         }
-        
+
         // Find the iframe that sent the message
-        const iframes = document.querySelectorAll('iframe');
-        const sourceIframe = Array.from(iframes).find(iframe => 
-          iframe.contentWindow === event.source
+        const iframes = document.querySelectorAll("iframe");
+        const sourceIframe = Array.from(iframes).find(
+          (iframe) => iframe.contentWindow === event.source,
         );
-        
+
         if (sourceIframe) {
           const container = sourceIframe.parentElement;
           if (container) {
@@ -121,30 +128,43 @@ class VerseEmbed {
             // Only update if height has changed
             if (this.lastHeight !== height) {
               this.lastHeight = height;
-              this.lastNormalHeight = height;  // Store the normal height
+              this.lastNormalHeight = height; // Store the normal height
               container.style.height = `${height}px`;
               sourceIframe.style.height = `${height}px`;
             }
           }
         }
-      } else if (message.type === 'fullScreenMode' && typeof message.fullScreen === 'boolean') {
+      } else if (
+        message.type === "fullScreenMode" &&
+        typeof message.fullScreen === "boolean"
+      ) {
         this.handleFullScreenMessage(message.fullScreen, event);
-      } else if (message.type === 'triggerSignInRedirect') {
-        window.location.href = `${this.baseUrl}/signin?iframe=true&redirectUrl=${encodeURIComponent(window.location.href)}`
+      } else if (message.type === "triggerSignInRedirect") {
+        window.location.href = `${this.baseUrl}/signin?iframe=true&redirectUrl=${encodeURIComponent(window.location.href)}`;
       }
     } catch (e) {
-      console.error('Error handling iframe message:', e);
+      console.error("Error handling iframe message:", e);
     }
   }
 
-  private createIframe({artworkId, editionNumber, seriesSlug, stylesPath }: {artworkId: string, seriesSlug?: string, editionNumber?: string, stylesPath?: string}): HTMLIFrameElement {
-    const iframe = document.createElement('iframe');
-    iframe.setAttribute('sandbox', iframeSandox.join(" "));
+  private createIframe({
+    artworkId,
+    editionNumber,
+    seriesSlug,
+    stylesPath,
+  }: {
+    artworkId: string;
+    seriesSlug?: string;
+    editionNumber?: string;
+    stylesPath?: string;
+  }): HTMLIFrameElement {
+    const iframe = document.createElement("iframe");
+    iframe.setAttribute("sandbox", iframeSandox.join(" "));
 
-    const url = seriesSlug 
+    const url = seriesSlug
       ? `${this.baseUrl}/series/${seriesSlug}?iframe=true&stylesPath=${stylesPath}`
-      : `${this.baseUrl}/artworks/${artworkId}${editionNumber ? '/' + editionNumber : ""}?iframe=true&stylesPath=${stylesPath}`;
-    
+      : `${this.baseUrl}/artworks/${artworkId}${editionNumber ? "/" + editionNumber : ""}?iframe=true&stylesPath=${stylesPath}`;
+
     iframe.src = url;
     iframe.style.cssText = `
       width: 100%;
@@ -152,8 +172,8 @@ class VerseEmbed {
       border: none;
       overflow: hidden;
     `;
-    iframe.setAttribute('scrolling', 'no');
-    
+    iframe.setAttribute("scrolling", "no");
+
     return iframe;
   }
 
@@ -165,36 +185,41 @@ class VerseEmbed {
       }
       return await response.text();
     } catch (error) {
-      console.error('Error loading custom styles:', error);
-      return '';
+      console.error("Error loading custom styles:", error);
+      return "";
     }
   }
 
   public async applyStyles(styles: string): Promise<void> {
     if (!this.iframe) {
-      console.error('No iframe found to apply styles to');
+      console.error("No iframe found to apply styles to");
       return;
     }
 
-    this.iframe.contentWindow?.postMessage({
-      type: 'applyStyles',
-      styles
-    }, new URL(this.baseUrl).origin);
+    this.iframe.contentWindow?.postMessage(
+      {
+        type: "applyStyles",
+        styles,
+      },
+      new URL(this.baseUrl).origin,
+    );
   }
 
   private async initializeContainer(container: HTMLElement): Promise<void> {
     const attributeName = {
-      artwork: 'verse-artwork-id',
-      edition: 'verse-edition-number',
-      serie: 'verse-series-slug',
-    }
+      artwork: "verse-artwork-id",
+      edition: "verse-edition-number",
+      serie: "verse-series-slug",
+    };
 
     const artworkId = container.getAttribute(attributeName.artwork);
     const editionNumber = container.getAttribute(attributeName.edition);
     const seriesSlug = container.getAttribute(attributeName.serie);
-    
+
     if (!artworkId && !seriesSlug && !editionNumber) {
-      console.error(`Container missing required attributes: either ${attributeName.artwork} or ${attributeName.serie} must be provided`);
+      console.error(
+        `Container missing required attributes: either ${attributeName.artwork} or ${attributeName.serie} must be provided`,
+      );
       return;
     }
 
@@ -211,16 +236,16 @@ class VerseEmbed {
     container.appendChild(loader);
 
     // Get styles path
-    const stylesPath = container.getAttribute('verse-custom-styles-path');
+    const stylesPath = container.getAttribute("verse-custom-styles-path");
 
     // Create iframe
     this.iframe = this.createIframe({
-      artworkId: artworkId || '',
+      artworkId: artworkId || "",
       editionNumber: editionNumber || undefined,
       seriesSlug: seriesSlug || undefined,
-      stylesPath: stylesPath || undefined
+      stylesPath: stylesPath || undefined,
     });
-    
+
     // Load custom styles if specified
     // const stylesPath = container.getAttribute('verse-custom-styles-path');
     // let customStyles = '';
@@ -234,7 +259,7 @@ class VerseEmbed {
     // Wait for iframe to load and apply styles
     await new Promise<void>((resolve) => {
       if (!this.iframe) {
-        return
+        return;
       }
 
       this.iframe.onload = async () => {
@@ -249,23 +274,30 @@ class VerseEmbed {
 
   public initialize(): void {
     // Add message event listener
-    window.addEventListener('message', this.handleMessage);
-    
+    window.addEventListener("message", this.handleMessage);
+
     const containers = [
-      ...Array.from(document.querySelectorAll<HTMLElement>('[verse-artwork-id]')),
-      ...Array.from(document.querySelectorAll<HTMLElement>('[verse-series-slug]')),
-    ]
-    containers.forEach(container => this.initializeContainer(container));
+      ...Array.from(
+        document.querySelectorAll<HTMLElement>("[verse-artwork-id]"),
+      ),
+      ...Array.from(
+        document.querySelectorAll<HTMLElement>("[verse-series-slug]"),
+      ),
+    ];
+    containers.forEach((container) => this.initializeContainer(container));
   }
 
   public forceRefreshMeasure(): void {
     if (!this.iframe) {
-      return
+      return;
     }
 
-    this.iframe.contentWindow?.postMessage({
-      type: "forceRefreshMeasure",
-    }, new URL(this.baseUrl).origin);
+    this.iframe.contentWindow?.postMessage(
+      {
+        type: "forceRefreshMeasure",
+      },
+      new URL(this.baseUrl).origin,
+    );
   }
 }
 
