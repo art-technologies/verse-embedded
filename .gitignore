@@ -7,3 +7,5 @@ certificates
 .next
 public/*.js
 public/*.js.map
+
+.idea
