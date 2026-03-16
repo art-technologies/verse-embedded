@@ -4,9 +4,12 @@
   "description": "Lightweight library for embedding Verse artwork iframes",
   "main": "dist/verse-embedded.js",
   "types": "dist/verse-embedded.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --outfile=dist/verse-embedded.js --outfile=public/verse-embedded.js --minify --sourcemap",
-    "dev": "esbuild src/index.ts --bundle --outfile=dist/verse-embedded.js --outfile=public/verse-embedded.js --sourcemap --watch",
+    "build": "esbuild src/index.ts --bundle --outfile=dist/verse-embedded.js --minify --sourcemap && cp dist/verse-embedded.js dist/verse-embedded.js.map public/",
+    "dev": "esbuild src/index.ts --bundle --outfile=dist/verse-embedded.js --sourcemap --watch & esbuild src/index.ts --bundle --outfile=public/verse-embedded.js --sourcemap --watch",
     "serve": "next dev --port 3001 --experimental-https --turbopack",
     "type-check": "tsc --noEmit",
     "prepare": "husky"
