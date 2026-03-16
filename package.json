@@ -2,6 +2,10 @@
   "name": "verse-embedded",
   "version": "1.0.3",
   "description": "Lightweight library for embedding Verse artwork iframes",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/art-technologies/verse-embedded"
+  },
   "main": "dist/verse-embedded.js",
   "types": "dist/verse-embedded.d.ts",
   "files": [
