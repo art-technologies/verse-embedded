@@ -1,6 +1,6 @@
 {
   "name": "verse-embedded",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Lightweight library for embedding Verse artwork iframes",
   "main": "dist/verse-embedded.js",
   "types": "dist/verse-embedded.d.ts",
