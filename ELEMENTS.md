@@ -25,7 +25,7 @@ Under the hood, Verse Elements uses hidden iframes and [penpal](https://github.c
 <script src="https://your-cdn/verse-elements.js"></script>
 
 <script>
-  const elements = new VerseElements({ baseUrl: "https://verse.example.com" });
+  const elements = new VerseElements({ baseUrl: "https://iframe.verse.works" });
 </script>
 ```
 
