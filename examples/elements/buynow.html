@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Title</title>
+    <script src="http://localhost:3001/public/verse-elements.js"></script>
+
+    <style>
+      iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+
+      body {
+        background: lavenderblush;
+      }
+
+      button {
+        width: 100px;
+        height: 50px;
+      }
+
+      .visible {
+        display: block !important;
+      }
+    </style>
+  </head>
+  <body style="background: lavenderblush">
+    <h2>Verse Elements: Basic Purchase Example</h2>
+    <div style="border: 1px solid black; padding: 8px; margin-bottom: 8px">
+      <h3>Authentication</h3>
+      <div class="auth-status-wrapper">
+        Auth status: <span class="auth-status">Loading...</span>
+      </div>
+      <div style="display: flex; gap: 10px">
+        <button disabled class="button-signin">Sign in</button>
+        <button disabled class="button-signout">Sign out</button>
+      </div>
+    </div>
+
+    <div style="border: 1px solid black; padding: 8px">
+      <h3>Purchase</h3>
+      <button disabled class="button-buynow" style="width: 200px">
+        Invoke purchase dialog
+      </button>
+      <div class="purchase-result"></div>
+    </div>
+
+    <script>
+      const ARTWORK_ID = "8d41773d-82e7-468c-8442-97563bf5721b";
+
+      const elements = new VerseElements({ baseUrl: "http://localhost:3000" });
+      const authStatusSpan = document.querySelector(".auth-status");
+      const buttonSignIn = document.querySelector(".button-signin");
+      const buttonSignOut = document.querySelector(".button-signout");
+      const buttonBuynow = document.querySelector(".button-buynow");
+      const purchaseResult = document.querySelector(".purchase-result");
+
+      async function checkAuthStatus() {
+        const isSignedIn = await elements.checkAuth();
+
+        if (isSignedIn) {
+          authStatusSpan.innerText = "Authenticated";
+          buttonSignIn.disabled = true;
+          buttonSignOut.disabled = false;
+          buttonBuynow.disabled = false;
+        } else {
+          authStatusSpan.innerText = "Not authenticated";
+          buttonSignIn.disabled = false;
+          buttonSignOut.disabled = true;
+          buttonBuynow.disabled = true;
+        }
+      }
+
+      buttonSignIn.addEventListener("click", function () {
+        elements.authorise().then(() => {
+          checkAuthStatus();
+        });
+      });
+
+      buttonSignOut.addEventListener("click", function () {
+        elements.signOut().then(() => {
+          checkAuthStatus();
+        });
+      });
+
+      checkAuthStatus();
+
+      buttonBuynow.addEventListener("click", function () {
+        purchaseResult.innerText = "Purchase in progress...";
+
+        elements.openPurchaseDialog(
+          ARTWORK_ID,
+          {
+            amount: {
+              currency: "USD",
+              value: "100",
+            },
+            userInput: [],
+          },
+          {
+            onSuccess({ editionId, editionNumber, artworkId }) {
+              purchaseResult.innerText = `Purchase successful: ${JSON.stringify({ editionId, editionNumber, artworkId })}`;
+            },
+            onTerminalFailure({ title, message }) {
+              console.error(`Error ${title}: ${message}`);
+            },
+            onClose() {
+              console.warn("User closed dialog");
+            },
+          },
+        );
+      });
+    </script>
+  </body>
+</html>
