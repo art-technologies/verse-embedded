@@ -4,7 +4,7 @@
 
 Verse Elements is a lightweight SDK that lets your website perform authenticated user actions on Verse — sign in, sign out, show a purchase dialog, check reserves — without embedding the full Verse UI.
 
-Under the hood, Verse Elements uses hidden iframes and [penpal](https://github.com/nicbarker/penpal) to communicate with Verse. The iframes are sandboxed and managed by the SDK — you don't need to deal with them directly.
+Under the hood, Verse Elements uses hidden iframes and [penpal](https://github.com/Aaronius/penpal) to communicate with Verse. The iframes are sandboxed and managed by the SDK — you don't need to deal with them directly.
 
 ## Verse Elements vs Verse Frame
 

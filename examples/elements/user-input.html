@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <title>Title</title>
     <script src="http://localhost:3001/public/verse-elements.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/codemirror.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/javascript/javascript.min.js"></script>
 
     <style>
       iframe {
@@ -26,6 +32,25 @@
 
       .visible {
         display: block !important;
+      }
+
+      .json-editor-wrapper label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .json-editor-wrapper .CodeMirror {
+        height: 300px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      .json-editor-wrapper .json-error {
+        color: red;
+        font-size: 12px;
+        margin-top: 4px;
+        min-height: 16px;
       }
     </style>
   </head>
@@ -50,14 +75,13 @@
       <div class="bookmark-status">Not generated</div>
     </div>
 
-    <div style="border: 1px solid black; padding: 8px; margin-bottom: 8px">
-      <h3>User Input</h3>
-      <label
-        >Key: <input type="text" class="input-key" value="some_key"
-      /></label>
-      <label
-        >Value: <input type="text" class="input-value" value="some_value"
-      /></label>
+    <div
+      style="border: 1px solid black; padding: 8px; margin-bottom: 8px"
+      class="json-editor-wrapper"
+    >
+      <h3>User Input (JSON)</h3>
+      <textarea id="json-editor"></textarea>
+      <div class="json-error" id="json-error"></div>
     </div>
 
     <div style="border: 1px solid black; padding: 8px">
@@ -69,7 +93,9 @@
     </div>
 
     <script>
-      const ARTWORK_ID = "6b3d644e-bf9d-4cd1-be12-aa12383f7a17";
+      const ARTWORK_ID =
+        new URLSearchParams(window.location.search).get("artworkId") ||
+        "0efab88c-7e13-436a-8fef-848b9e42a777";
 
       let bookmarkState = null;
 
@@ -82,9 +108,8 @@
         ".button-generate-bookmark",
       );
       const bookmarkStatus = document.querySelector(".bookmark-status");
-      const inputKey = document.querySelector(".input-key");
-      const inputValue = document.querySelector(".input-value");
       const purchaseResult = document.querySelector(".purchase-result");
+      const jsonError = document.getElementById("json-error");
 
       async function checkAuthStatus() {
         const isSignedIn = await elements.checkAuth();
@@ -126,16 +151,30 @@
 
       checkAuthStatus();
 
+      // JSON editor
+      window.userInput = [{ key: "some_key", value: "some_value" }];
+      const editor = CodeMirror.fromTextArea(
+        document.getElementById("json-editor"),
+        {
+          mode: { name: "javascript", json: true },
+          lineNumbers: true,
+          matchBrackets: true,
+          tabSize: 2,
+        },
+      );
+      editor.setValue(JSON.stringify(window.userInput, null, 2));
+
+      editor.on("change", function () {
+        try {
+          window.userInput = JSON.parse(editor.getValue());
+          jsonError.textContent = "";
+        } catch (e) {
+          jsonError.textContent = "Invalid JSON: " + e.message;
+        }
+      });
+
       buttonBuynow.addEventListener("click", function () {
         purchaseResult.innerText = "Purchase in progress...";
-
-        const userInput = [{ key: inputKey.value, value: inputValue.value }];
-        if (bookmarkState) {
-          userInput.unshift({
-            key: "$user_hash",
-            value: bookmarkState.signedToken,
-          });
-        }
 
         elements.openPurchaseDialog(
           ARTWORK_ID,
@@ -144,14 +183,19 @@
               currency: "USD",
               value: "100",
             },
-            userInput,
+            userInput: [
+              ...(bookmarkState
+                ? [{ key: "$user_hash", value: bookmarkState.signedToken }]
+                : []),
+              ...window.userInput,
+            ],
           },
           {
             onSuccess({ editionId, editionNumber, artworkId }) {
               purchaseResult.innerText = `Purchase successful: ${JSON.stringify({ editionId, editionNumber, artworkId })}`;
             },
             onTerminalFailure({ title, message }) {
-              console.error(`Error ${title}: ${message}`);
+              alert(`Error ${title}: ${message}`);
             },
             onClose() {
               console.warn("User closed dialog");

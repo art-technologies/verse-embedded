@@ -59,7 +59,9 @@
     </div>
 
     <script>
-      const ARTWORK_ID = "8d41773d-82e7-468c-8442-97563bf5721b";
+      const ARTWORK_ID =
+        new URLSearchParams(window.location.search).get("artworkId") ||
+        "8d41773d-82e7-468c-8442-97563bf5721b";
 
       const elements = new VerseElements({ baseUrl: "http://localhost:3000" });
       const authStatusSpan = document.querySelector(".auth-status");
