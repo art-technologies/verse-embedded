@@ -99,7 +99,11 @@
 
       let bookmarkState = null;
 
-      const elements = new VerseElements({ baseUrl: "http://localhost:3000" });
+      const BASE_URL =
+        new URLSearchParams(window.location.search).get("origin") ||
+        "https://iframe.verse.works";
+
+      const elements = new VerseElements({ baseUrl: BASE_URL });
       const authStatusSpan = document.querySelector(".auth-status");
       const buttonSignIn = document.querySelector(".button-signin");
       const buttonSignOut = document.querySelector(".button-signout");
