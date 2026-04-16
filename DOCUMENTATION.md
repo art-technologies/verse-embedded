@@ -61,6 +61,10 @@ where
 - You can embed Verse iframe only on `localhost:3000` origin
 - In order to make it avaiable on your website, please chat with Verse tech team and give them your origin needed for whitelisting
 
+## HTTPS Requirement
+
+Production integration of Verse Frame / Verse Elements requires the parent page to be served over HTTPS. Verse iframes will not load on pages served over plain HTTP in production environments. Ensure your site has HTTP-to-HTTPS redirects configured before going live.
+
 ## Comments on custom CSS
 
 Because Verse uses a build system, class names may include postfixes that are not known in advance. Therefore, in the current version,
