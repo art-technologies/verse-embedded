@@ -1,0 +1,432 @@
+# ─── Primary Market Queries ──────────────────────────────────────────────
+# Examples for querying primary market listings, auctions, and buy-now drops.
+
+# ── 1. Get a primary market listing for an artwork ───────────────────────
+# Returns the current listing with strategy details (auction, buy-now, open edition).
+
+query PrimaryMarketListing($artworkId: ID!) {
+  primaryMarketListing(artworkId: $artworkId) {
+    id
+    startsAt
+    startedAt
+    endsAt
+    endedAt
+    endReason
+    createdAt
+    artwork {
+      id
+      title
+      blockchain
+      artist {
+        name
+        slug
+      }
+    }
+    strategy {
+      __typename
+      ... on PMAuctionStrategy {
+        pmListingId
+        minimumBid {
+          value
+          currency
+        }
+        stats {
+          bidsCount
+          highestBid {
+            id
+            amount {
+              value
+              currency
+            }
+            bidder {
+              username
+            }
+          }
+        }
+        rankedAuctionSettings {
+          topNWinners
+        }
+        extensionSettings {
+          extensionCutoff
+          extendUpToMsec
+        }
+        leaders {
+          id
+          amount {
+            value
+            currency
+          }
+          bidder {
+            username
+          }
+        }
+      }
+      ... on PMBuyNowLimitedEditionStrategy {
+        pmListingId
+        price {
+          value
+          currency
+        }
+        maxEditions
+        reservedEditions
+        stats {
+          issuedEditions
+        }
+        dutchAuction {
+          priceBrackets
+          decreaseRateSeconds
+          currentBracket
+          nextBracketAt
+          rebate
+        }
+        purchaseQueue {
+          queueId
+          queueSize
+          activePurchases
+        }
+      }
+      ... on PMBuyNowOpenEditionStrategy {
+        pmListingId
+        price {
+          value
+          currency
+        }
+        stats {
+          issuedEditions
+        }
+        dutchAuction {
+          priceBrackets
+          decreaseRateSeconds
+          currentBracket
+          nextBracketAt
+        }
+      }
+    }
+  }
+}
+
+# ── 2. Get auction bids for a listing ────────────────────────────────────
+# Fetch all bids and leaders for an auction-based PM listing.
+
+query AuctionBids($artworkId: ID!) {
+  primaryMarketListing(artworkId: $artworkId) {
+    id
+    startsAt
+    endsAt
+    strategy {
+      ... on PMAuctionStrategy {
+        minimumBid {
+          value
+          currency
+        }
+        currentStep
+        entryBid {
+          value
+          currency
+        }
+        stats {
+          bidsCount
+          highestBid {
+            amount {
+              value
+              currency
+            }
+          }
+        }
+        bids {
+          id
+          amount {
+            value
+            currency
+          }
+          maxAmount {
+            value
+            currency
+          }
+          bidder {
+            username
+          }
+          status
+          isAbsentee
+          createdAt
+        }
+        leaders {
+          id
+          amount {
+            value
+            currency
+          }
+          bidder {
+            username
+          }
+        }
+        lowestWinningBid {
+          amount {
+            value
+            currency
+          }
+        }
+      }
+    }
+  }
+}
+
+# ── 3. Get a primary market sale by ID ───────────────────────────────────
+# Check the status and details of a specific sale.
+
+query PrimaryMarketSaleDetails($saleId: ID!) {
+  primaryMarketSale(pmSaleId: $saleId) {
+    id
+    status
+    amount {
+      value
+      currency
+    }
+    createdAt
+    finishedAt
+    failReason
+    editionId
+    edition {
+      id
+      editionNumber
+      tokenId
+    }
+    pmListing {
+      id
+      artwork {
+        id
+        title
+      }
+      strategy {
+        __typename
+      }
+    }
+  }
+}
+
+# ── 4. Browse live and upcoming drops ────────────────────────────────────
+# Use the explore query filtered to live/upcoming primary market drops.
+
+query LiveAndUpcomingDrops {
+  explore(
+    filter: { exploreTab: [LIVE, UPCOMING], market: [PRIMARY] }
+    sorting: { sort: UPCOMING, direction: ASC }
+    first: 20
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    nodes {
+      id
+      name
+      slug
+      blockchain
+      artists {
+        name
+        slug
+      }
+      previewAsset {
+        ...StaticAssetFields
+      }
+      artworks {
+        id
+        title
+        primaryMarketListing {
+          startsAt
+          endsAt
+          startedAt
+          endedAt
+          strategy {
+            __typename
+            ... on PMBuyNowLimitedEditionStrategy {
+              price {
+                value
+                currency
+              }
+              maxEditions
+              stats {
+                issuedEditions
+              }
+            }
+            ... on PMAuctionStrategy {
+              minimumBid {
+                value
+                currency
+              }
+              stats {
+                bidsCount
+              }
+            }
+            ... on PMBuyNowOpenEditionStrategy {
+              price {
+                value
+                currency
+              }
+              stats {
+                issuedEditions
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+# ── 5. Artwork with project type and full media ──────────────────────────
+# Fetches an artwork including its project kind (generative, curated, Art Blocks, etc.)
+# and all static asset formats for cover and editions.
+
+query ArtworkWithProjectDetails($artworkId: ID!) {
+  artworksPage(request: { filter: { ids: [$artworkId] }, first: 1 }) {
+    nodes {
+      id
+      title
+      blockchain
+      artist {
+        name
+        slug
+      }
+      cover {
+        ...StaticAssetFields
+      }
+      banner {
+        ...StaticAssetFields
+      }
+      artworkKind {
+        __typename
+        ... on GenerativeProjectArtworkKind {
+          iframeUrl
+          aspectRatio
+          mintIframeUrl
+          allowUserCuration
+          showStaticPreview
+          previewGeneratorSettings {
+            previewTriggerType
+            delayMillis
+            previewGeneratorMode
+            previewGeneratorEngine
+            previewSize
+            timeoutMsec
+          }
+        }
+        ... on ProjectArtworkKind {
+          withRepetitions
+          allowUserSelection
+          items {
+            id
+            isAvailable
+            probability
+            featuresJson
+            staticAsset {
+              ...StaticAssetFields
+            }
+          }
+        }
+        ... on ArtblocksProjectArtworkKind {
+          iframeUrl
+          aspectRatio
+          artblocksProjectId
+          artblocksPreviewPrefix
+          artblocksLivePrefix
+          allowUserCuration
+          showStaticPreview
+        }
+        ... on QuasiDragonsCompositeArtworkKind {
+          artworkId
+          baseTileArtworkId
+          compositeBuilderIframeUrl
+          generatorIframeUrl
+          layouts {
+            layoutName
+            layoutType
+            minted
+            dragonsMinted
+          }
+        }
+      }
+      primaryMarketListing {
+        id
+        startsAt
+        endsAt
+        strategy {
+          __typename
+        }
+      }
+      stats {
+        issuedEditions
+        ownersCount
+      }
+      editions(first: 5) {
+        id
+        editionNumber
+        tokenId
+        hash
+        staticAsset {
+          ...StaticAssetFields
+        }
+        features {
+          ... on StringFeatureValue {
+            name
+            valueJson
+          }
+        }
+      }
+    }
+  }
+}
+
+# ── Shared: full StaticAsset fragment ────────────────────────────────────
+# Covers all union members: ImageAsset, VideoAsset, SVGAsset, AudioAsset, IFrameAsset.
+
+fragment StaticAssetFields on StaticAsset {
+  __typename
+  ... on ImageAsset {
+    id
+    baseUrl
+    aspectRatio
+    width
+    height
+    isGif
+    mimeType
+    fileSize
+    caption
+  }
+  ... on VideoAsset {
+    id
+    baseUrl
+    previewImageUrl
+    previewAspectRatio
+    width
+    height
+    mimeType
+    fileSize
+    caption
+  }
+  ... on SVGAsset {
+    id
+    baseUrl
+    previewImageUrl
+    previewAspectRatio
+    mimeType
+    fileSize
+    caption
+  }
+  ... on AudioAsset {
+    id
+    baseUrl
+    duration
+    mimeType
+    fileSize
+  }
+  ... on IFrameAsset {
+    id
+    baseUrl
+    iframeUrl
+    previewImageUrl
+    aspectRatio
+    caption
+  }
+}

@@ -1,0 +1,492 @@
+# ─── Asset & Edition Retrieval Queries ────────────────────────────────────
+# Examples for fetching editions, artworks, and collections.
+
+# ── 1. Get a single edition by artwork + edition number ──────────────────
+
+query EditionByNumber($artworkId: ID!, $editionNumber: String!) {
+  editionByNumber(artworkId: $artworkId, editionNumber: $editionNumber) {
+    id
+    editionNumber
+    tokenId
+    title
+    description
+    status
+    createdAt
+    likes
+    contractInfo {
+      contractAddress
+      contractType
+      chain
+    }
+    artwork {
+      id
+      title
+      blockchain
+      artist {
+        name
+        slug
+      }
+      collection {
+        id
+        slug
+        name
+        blockchain
+      }
+      stats {
+        issuedEditions
+        floorPrice {
+          value
+          currency
+        }
+      }
+    }
+    owner {
+      ... on UserEditionOwner {
+        owner {
+          username
+        }
+      }
+      ... on BlockchainAddressEditionOwner {
+        blockchainAddress {
+          address
+        }
+      }
+    }
+    staticAsset {
+      ... on ImageAsset {
+        id
+        baseUrl
+        aspectRatio
+        isGif
+        mimeType
+      }
+      ... on VideoAsset {
+        id
+        baseUrl
+        previewImageUrl
+        previewAspectRatio
+        mimeType
+      }
+      ... on SVGAsset {
+        id
+        baseUrl
+        previewImageUrl
+        previewAspectRatio
+      }
+      ... on IFrameAsset {
+        id
+        iframeUrl
+        previewImageUrl
+        aspectRatio
+      }
+    }
+    features {
+      ... on StringFeatureValue {
+        name
+        valueJson
+      }
+    }
+    smListing {
+      id
+      isActive
+      listedAt
+      additionalStrategies {
+        ... on SMBuyNowStrategy {
+          price {
+            value
+            currency
+          }
+        }
+      }
+    }
+    stats {
+      lastSalePrice {
+        value
+        currency
+      }
+      lastSaleTime
+    }
+  }
+}
+
+# ── 2. Look up an edition by contract address + token ID ─────────────────
+
+query EditionByContract($contractAddress: String!, $tokenId: String!) {
+  editionByContract(contractAddress: $contractAddress, tokenId: $tokenId) {
+    id
+    editionNumber
+    tokenId
+    title
+    status
+    artwork {
+      id
+      title
+      artist {
+        name
+      }
+    }
+    owner {
+      ... on UserEditionOwner {
+        owner {
+          username
+        }
+      }
+      ... on BlockchainAddressEditionOwner {
+        blockchainAddress {
+          address
+        }
+      }
+    }
+    staticAsset {
+      ... on ImageAsset {
+        baseUrl
+        aspectRatio
+      }
+      ... on VideoAsset {
+        baseUrl
+        previewImageUrl
+      }
+    }
+  }
+}
+
+# ── 3. Browse editions with pagination, filtering, and sorting ───────────
+
+query BrowseEditions(
+  $artworkId: ID!
+  $first: Int!
+  $after: Cursor
+  $sort: AssetSortOption!
+  $direction: SortDirection!
+) {
+  assetsPage(
+    filter: { assetType: EDITION, artworkIds: [$artworkId] }
+    sorting: { sort: $sort, direction: $direction }
+    first: $first
+    after: $after
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    nodes {
+      id
+      asset {
+        ... on Edition {
+          id
+          editionNumber
+          tokenId
+          title
+          status
+          createdAt
+          owner {
+            ... on UserEditionOwner {
+              owner {
+                username
+              }
+            }
+          }
+          smListing {
+            isActive
+            additionalStrategies {
+              ... on SMBuyNowStrategy {
+                price {
+                  value
+                  currency
+                }
+              }
+            }
+          }
+          staticAsset {
+            ... on ImageAsset {
+              baseUrl
+              aspectRatio
+            }
+            ... on VideoAsset {
+              previewImageUrl
+            }
+          }
+          stats {
+            lastSalePrice {
+              value
+              currency
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+# ── 4. Browse assets with buy-now filter ─────────────────────────────────
+
+query AssetsForSale($first: Int!, $after: Cursor) {
+  assetsPage(
+    filter: {
+      assetType: EDITION
+      availability: [BUY_NOW]
+    }
+    sorting: { sort: LISTED_AT, direction: DESC }
+    first: $first
+    after: $after
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    nodes {
+      id
+      assetType
+      asset {
+        ... on Edition {
+          id
+          editionNumber
+          title
+          artwork {
+            id
+            title
+            artist {
+              name
+            }
+          }
+          smListing {
+            additionalStrategies {
+              ... on SMBuyNowStrategy {
+                price {
+                  value
+                  currency
+                }
+              }
+            }
+          }
+          staticAsset {
+            ... on ImageAsset {
+              baseUrl
+              aspectRatio
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+# ── 5. Get a collection by slug ──────────────────────────────────────────
+
+query CollectionBySlug($slug: String!) {
+  collectionsPage(request: { filter: { slugs: [$slug] }, first: 1 }) {
+    nodes {
+      id
+      name
+      slug
+      description
+      blockchain
+      tags
+      artists {
+        name
+        slug
+      }
+      persons {
+        name
+        slug
+      }
+      stats {
+        issuedEditions
+        ownersCount
+        floorPrice {
+          value
+          currency
+        }
+        tradedVolume {
+          value
+          currency
+        }
+        lastSalePrice {
+          value
+          currency
+        }
+        highestSalePrice {
+          value
+          currency
+        }
+        listedItems
+      }
+      previewAsset {
+        ... on ImageAsset {
+          baseUrl
+          aspectRatio
+          isGif
+        }
+        ... on VideoAsset {
+          baseUrl
+          previewImageUrl
+          previewAspectRatio
+        }
+      }
+      banner {
+        ... on ImageAsset {
+          baseUrl
+          aspectRatio
+        }
+      }
+      artworks {
+        id
+        title
+        artist {
+          name
+        }
+        stats {
+          issuedEditions
+          floorPrice {
+            value
+            currency
+          }
+        }
+        cover {
+          ... on ImageAsset {
+            baseUrl
+            aspectRatio
+          }
+        }
+      }
+    }
+  }
+}
+
+# ── 6. Search collections with pagination ────────────────────────────────
+
+query SearchCollections($search: String!, $first: Int!, $after: Cursor) {
+  collectionsPage(
+    request: {
+      filter: { search: $search }
+      first: $first
+      after: $after
+    }
+  ) {
+    totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    nodes {
+      id
+      name
+      slug
+      blockchain
+      artists {
+        name
+      }
+      stats {
+        issuedEditions
+        floorPrice {
+          value
+          currency
+        }
+      }
+      previewAsset {
+        ... on ImageAsset {
+          baseUrl
+          aspectRatio
+        }
+      }
+    }
+  }
+}
+
+# ── 7. Get an artwork with full details ──────────────────────────────────
+
+query ArtworkDetails($artworkId: ID!) {
+  artworksPage(request: { filter: { ids: [$artworkId] }, first: 1 }) {
+    nodes {
+      id
+      title
+      year
+      bio
+      blockchain
+      saleType
+      displayStyle
+      license
+      artist {
+        name
+        slug
+        bio
+      }
+      collection {
+        id
+        name
+        slug
+      }
+      cover {
+        ... on ImageAsset {
+          baseUrl
+          aspectRatio
+          width
+          height
+          isGif
+        }
+        ... on VideoAsset {
+          baseUrl
+          previewImageUrl
+          previewAspectRatio
+        }
+      }
+      stats {
+        issuedEditions
+        ownersCount
+        floorPrice {
+          value
+          currency
+        }
+        tradedVolume {
+          value
+          currency
+        }
+        lastSalePrice {
+          value
+          currency
+        }
+        highestSalePrice {
+          value
+          currency
+        }
+        listedItems
+      }
+      primaryMarketListing {
+        id
+        startsAt
+        endsAt
+        startedAt
+        endedAt
+        strategy {
+          __typename
+        }
+      }
+      floorListing {
+        id
+        price {
+          value
+          currency
+        }
+      }
+      bestOffer {
+        id
+        price {
+          value
+          currency
+        }
+      }
+      links {
+        title
+        url
+      }
+      exhibitions {
+        name
+        slug
+      }
+    }
+  }
+}

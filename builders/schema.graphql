@@ -1,0 +1,1794 @@
+type Query {
+  editionByNumber(artworkId: ID!, editionNumber: String!): Edition
+  editionByContract(contractAddress: String!, tokenId: String!): Edition
+  assetsPage(filter: AssetFilter, sorting: AssetSorting, after: Cursor, first: Int!): AssetConnection!
+  asset(id: ID!, assetType: AssetType!): Asset
+  primaryMarketListing(artworkId: ID!): PrimaryMarketListing
+  primaryMarketListings(artworkId: ID!): [PrimaryMarketListing!]
+  primaryMarketSale(pmSaleId: ID!): PrimaryMarketSale!
+  secondaryMarketSale(smSaleId: ID!): SecondaryMarketSale!
+  smOfferMatchesPage(request: SMOfferMatchRequest!): SMOfferMatchConnection!
+  mintPassConfiguration(pmListingId: ID!): MintPassConfiguration!
+  artworkFees(artworkId: ID!): Fees!
+  estimateSecondaryMarketFees(artworkId: ID!, price: InputAmount!, assetType: AssetType! = EDITION): FeeEstimation!
+  stats(period: MarketplaceStatsPeriod!): MarketplaceStats!
+  activityPage(filter: ActivityPageFilter, after: Cursor, first: Int!): ActivityEntryConnection!
+  orders(request: MarketplaceOrdersRequest!): MarketplaceOrderConnection!
+  explore(filter: ExploreFilter, sorting: ExploreSorting, after: Cursor, first: Int! = 20): CollectionConnection!
+  search(query: String!, params: SearchParams): SearchResult!
+  projectStaticAssetByHash(artworkId: ArtworkID!, hash: String!, editionNumber: Int, totalEditions: Int, userInput: [PreviewUserInput!]): StaticAsset!
+  reverseResolveENS(addresses: [String!]!): [String!]!
+  artworksPage(request: ArtworksPageRequest!): ArtworkConnection!
+  collectionsPage(request: CollectionsPageRequest!): CollectionConnection!
+  exhibitionsPage(request: ExhibitionsPageRequest!): ExhibitionConnection!
+  galleriesPage(request: GalleriesPageRequest!): GalleryConnection!
+  linksPage(request: LinksPageRequest!): LinkConnection!
+  personsPage(request: PersonsPageRequest!): PersonConnection!
+  userByUsername(username: String!): UserPublic
+  userById(id: String!): UserPublic
+  userByLinkedWallet(network: LinkedWalletNetwork!, address: String!): UserPublic
+  usersByLinkedWallet(network: LinkedWalletNetwork!, addresses: [String]!): [UserPublic]!
+}
+
+type ActivityEntry {
+  id: ID!
+  entryType: ActivityEntryType!
+  timestamp: Time!
+  offerId: ID
+  edition: Edition
+  asset: Asset
+  assetType: AssetType!
+  artwork: Artwork!
+  artworks: [Artwork!]!
+  fromUserId: UserPublic
+  toUserId: UserPublic
+  fromBlockchainAddress: String
+  toBlockchainAddress: String
+  fromEthereumAddress: EthereumAddress
+  toEthereumAddress: EthereumAddress
+  transactionHash: String
+  amount: String!
+}
+
+type ActivityEntryConnection {
+  pageInfo: PageInfo!
+  nodes: [ActivityEntry!]!
+}
+
+enum ActivityEntryType {
+  PM_SALE
+  SM_LISTED
+  SM_DELISTED
+  SM_SALE
+  SM_OFFER
+  SM_GLOBAL_OFFER
+  OS_SALE
+  OS_OFFER
+  OS_COLLECTION_OFFER
+  OS_LISTED
+  NEW_FLOOR_PRICE
+}
+
+input ActivityPageFilter {
+  assetIds: [ID!]
+  artworkId: ID
+  artworkIds: [ID!]
+  userId: ID
+  addresses: [String!]
+  activityType: [ActivityEntryType!]
+  assetType: AssetType
+  tags: TagsFilter
+}
+
+union AdditionalSecondaryMarketStrategy = SMBuyNowStrategy
+
+type Amount {
+  value: Decimal!
+  currency: String!
+}
+
+type ArtblocksProjectArtworkKind {
+  iframeUrl: String!
+  aspectRatio: Float!
+  previewGeneratorSettings: PreviewGeneratorSettings!
+  allowUserCuration: Boolean
+  showStaticPreview: Boolean
+  artblocksPreviewPrefix: String!
+  artblocksLivePrefix: String!
+  artblocksProjectId: Int!
+}
+
+type Artwork {
+  id: ArtworkID!
+  editions(first: Int! = 50000, editionId: ID): [Edition!]!
+  myEditions: [Edition!]!
+  features: [Feature!]
+  primaryMarketListing: PrimaryMarketListing
+  primaryMarketListings: [PrimaryMarketListing!]
+  stats(filter: StatsFilter): ArtworkStats!
+  floorEdition: Edition
+  smSellingOptions: SMArtworkSellingOptions!
+  fees: Fees
+  highestGlobalOffer: SecondaryMarketOffer
+  floorListing: MarketplaceOrder
+  bestOffer: MarketplaceOrder
+  osSlug: String
+  contractAddress: String
+  artist: Person
+  title: String
+  year: String
+  bio: Markdown
+  cover: StaticAsset
+  banner: StaticAsset
+  updatedAt: Time
+  featuredScore: Float!
+  isHidden: Boolean!
+  links: [Link!]!
+  exhibitions: [Exhibition!]!
+  saleType: ArtworkSaleType!
+  saleDetails: String
+  blockchain: ProductChain!
+  expectedSaleDate: Time
+  displayStyle: DisplayStyle!
+  license: String
+  requiresShippingDetails: Boolean!
+  secondaryMarketSaleWithPhysical: Boolean!
+  secondaryMarketDisabled: Boolean!
+  collection: Collection
+  artworkKind: ArtworkKind
+}
+
+type ArtworkConnection {
+  totalCount: Int
+  pageInfo: PageInfo!
+  nodes: [Artwork!]!
+}
+
+scalar ArtworkID
+
+union ArtworkKind = ProjectArtworkKind | GenerativeProjectArtworkKind | ArtblocksProjectArtworkKind | QuasiDragonsCompositeArtworkKind
+
+enum ArtworkSaleType {
+  REGULAR
+  PRIVATE
+  NOTFORSALE
+  SILENT
+}
+
+input ArtworksPageFilter {
+  ids: [ID!]
+  showHidden: Boolean
+  containsTags: [String!]
+  notContainsTags: [String!]
+  search: String
+}
+
+input ArtworksPageRequest {
+  filter: ArtworksPageFilter
+  after: Cursor
+  first: Int! = 20
+}
+
+type ArtworkStats {
+  artworkId: ID!
+  issuedEditions: Int!
+  ownersCount: Int!
+  custodialEditions: Int!
+  floorPrice: Amount
+  tradedVolume: Amount!
+  lastSaleTime: Time
+  lastSalePrice: Amount
+  highestSalePrice: Amount
+  listedItems: Int
+  floorPriceForPeriod(period: MarketplaceStatsPeriod!): Amount
+}
+
+type ArtworkVolume {
+  artwork: Artwork!
+  totalVolume: String!
+  totalSales: Int!
+  primaryVolume: String!
+  primarySales: Int!
+  secondaryVolume: String!
+  secondarySales: Int!
+  openseaVolume: String!
+  openseaSales: Int!
+}
+
+type Asset {
+  id: ID!
+  assetType: AssetType!
+  creator: UserPublic
+  asset: AssetPrimitive!
+  artwork: Artwork
+  smListing: SecondaryMarketListing
+  stats: EditionStats!
+}
+
+input AssetAdvancedFeatureFilter {
+  filter: AssetFilterFeature
+  exists: AssetFilterFeatureExists
+  bool: AssetFilterFeatureBool
+}
+
+type AssetConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  nodes: [Asset!]!
+}
+
+type AssetFees {
+  assetType: AssetType!
+  primaryMarket: PrimaryMarketFees!
+  secondaryMarket: SecondaryMarketFees!
+}
+
+input AssetFilter {
+  ids: [ID!]
+  assetType: AssetType! = EDITION
+  artworkIds: [ID!]
+  artistIds: [ID!]
+  hashes: [String!]
+  availability: [AssetFilterAvailabilityOption!]
+  owners: [AssetFilterOwner!]
+  features: [AssetFilterFeature!]
+  advancedFeatures: AssetAdvancedFeatureFilter
+  includeCollectionTags: [String!]
+  excludeCollectionTags: [String!]
+}
+
+enum AssetFilterAvailabilityOption {
+  BUY_NOW
+  ACCEPTING_OFFERS
+}
+
+input AssetFilterFeature {
+  name: String!
+  value: String!
+}
+
+input AssetFilterFeatureBool {
+  must: [AssetAdvancedFeatureFilter!]
+  mustNot: [AssetAdvancedFeatureFilter!]
+  should: [AssetAdvancedFeatureFilter!]
+}
+
+input AssetFilterFeatureExists {
+  name: String!
+}
+
+input AssetFilterOwner {
+  blockchainAddress: String
+  userId: String
+}
+
+input AssetInput {
+  assetId: ID!
+  assetType: AssetType!
+}
+
+union AssetPrimitive = Edition | Bookmark
+
+input AssetSorting {
+  sort: AssetSortOption!
+  direction: SortDirection!
+}
+
+enum AssetSortOption {
+  CREATED_AT
+  LIST_PRICE
+  EDITION_NUMBER
+  LAST_SALE_PRICE
+  LAST_SALE_TIME
+  OWNER
+  LIKED
+  TITLE
+  LISTED_AT
+  LAST_TRANSFERRED_AT
+}
+
+enum AssetType {
+  EDITION
+  BOOKMARK
+}
+
+type AudioAsset implements IStaticAsset {
+  id: StaticAssetID!
+  baseUrl: String!
+  duration: Float
+  mimeType: String
+  fileSize: Int
+  internalTitle: String
+}
+
+type AuditSale {
+  saleId: ID!
+  order: Order!
+  buyer: UserPublic!
+  market: Market!
+  saleType: String!
+  amount: Amount!
+  status: String!
+  createdAt: Time!
+  finishedAt: Time
+  moneyHeldAt: Time
+  moneyChargedAt: Time
+  failReason: String
+  asset: Asset
+  assetType: AssetType!
+  artwork: Artwork
+  fees: SaleFees
+  bid: PrimaryMarketBid
+}
+
+type BitcoinProductAddress implements BlockchainAddress {
+  address: String!
+}
+
+interface BlockchainAddress {
+  address: String!
+}
+
+type BlockchainAddressEditionOwner {
+  blockchainAddress: EthereumAddress!
+}
+
+type BlockchainSale {
+  transactionHash: String!
+  editionId: ID!
+  amountUsd: String
+}
+
+type Bookmark {
+  hash: String!
+  asset: Asset!
+  signedToken: String!
+  artworkId: ID!
+  staticAsset: StaticAsset
+  isFavorite: Boolean!
+  userInput: [SavedUserInput!]
+  owner: UserPublic!
+}
+
+enum Chain {
+  ETHEREUM
+  SOLANA
+  TEZOS
+  BITCOIN
+  BASE
+  NOT_SPECIFIED
+}
+
+type Collection {
+  id: ID!
+  artworkIds: [ArtworkID!]!
+  features: [Feature!]
+  contract: ContractInfo
+  floorEdition: Edition
+  stats(filter: StatsFilter): CollectionStats!
+  floorListing: MarketplaceOrder
+  bestOffer: MarketplaceOrder
+  highestGlobalOffer: SecondaryMarketOffer
+  osSlug: String
+  contractAddress: String
+  name: String
+  slug: String!
+  year: String
+  artworks: [Artwork!]!
+  artists: [Person!]!
+  persons: [Person!]!
+  description: Markdown
+  previewAsset: StaticAsset
+  banner: StaticAsset
+  blockchain: ProductChain!
+  featuredScore: Float!
+  updatedAt: Time
+  isHidden: Boolean!
+  links: [Link!]!
+  exhibitions: [Exhibition!]!
+  saleType: ArtworkSaleType!
+  saleDetails: String
+  license: String
+  tabs: [ExploreTabFilter!]
+  tags: [String!]
+  canEdit: Boolean!
+  canMint: Boolean!
+}
+
+type CollectionConnection {
+  totalCount: Int
+  pageInfo: PageInfo!
+  nodes: [Collection!]!
+}
+
+input CollectionsPageFilter {
+  ids: [ID!]
+  slugs: [String!]
+  containsTags: [String!]
+  notContainsTags: [String!]
+  showHidden: Boolean
+  search: String
+}
+
+input CollectionsPageRequest {
+  filter: CollectionsPageFilter
+  after: Cursor
+  first: Int! = 20
+}
+
+type CollectionStats {
+  collectionId: ID!
+  artworkIds: [ID!]!
+  issuedEditions: Int!
+  ownersCount: Int!
+  custodialEditions: Int!
+  floorPrice: Amount
+  tradedVolume: Amount
+  lastSaleTime: Time
+  lastSalePrice: Amount
+  highestSalePrice: Amount
+  listedItems: Int
+  floorPriceForPeriod(period: MarketplaceStatsPeriod!): Amount
+}
+
+type CollectionVolume {
+  collection: Collection!
+  totalVolume: String!
+  totalSales: Int!
+  primaryVolume: String!
+  primarySales: Int!
+  secondaryVolume: String!
+  secondarySales: Int!
+  openseaVolume: String!
+  openseaSales: Int!
+}
+
+type ContractInfo {
+  contractAddress: String!
+  contractType: ContractType!
+  chain: ProductChain!
+}
+
+enum ContractType {
+  ERC_721
+  ERC_721_CURATED
+  ERC_721v3
+  ERC_721v3_ON_CHAIN
+  ERC_721v3_CUSTOM_v1
+  ERC_1155
+  ERC_1155v2
+  SOLANA
+  ARTBLOCKS
+  TEZOS_FXHASH
+  TEZOS_OBJKT
+}
+
+scalar CountryIsoCode
+
+type CreatorIncomeDefinition {
+  userId: ID!
+  cut: Decimal!
+}
+
+type CryptoWallet implements GenericWallet {
+  id: ID!
+  currency: String!
+  balance: Decimal!
+  availableBalance: Decimal!
+  audit: [WalletAuditEntry!]!
+}
+
+scalar Cursor
+
+scalar Decimal
+
+type DecreasingSupplySettings {
+  decreaseBy: Int!
+  decreaseRateSeconds: Int!
+  nextDecreaseAt: Time
+}
+
+enum DisplayStyle {
+  DisplayRegular
+  DisplayWide
+}
+
+type DutchAuctionSettings {
+  priceBrackets: [Decimal!]!
+  decreaseRateSeconds: Int!
+  currentBracket: Decimal
+  nextBracketAt: Time
+  rebate: Boolean!
+}
+
+type Edition {
+  id: ID!
+  asset: Asset!
+  likes: Int!
+  isLiked: Boolean!
+  artworkId: ID!
+  artwork: Artwork!
+  primaryMarketListingId: ID!
+  editionNumber: Int!
+  hash: String
+  userInput: [EditionUserInput!]
+  tokenId: String
+  contractInfo: ContractInfo
+  status: EditionStatus!
+  mintingOptionType: MintingOptionType!
+  events: [EditionEvent!]!
+  owner: EditionOwner!
+  features: [FeatureValue!]
+  title: String
+  description: String
+  createdAt: Time!
+  tokenUri: String
+  smListing: SecondaryMarketListing
+  osListing: OpenseaListing
+  floorListing: MarketplaceOrder
+  bestOffer: MarketplaceOrder
+  stats: EditionStats!
+  staticAsset: StaticAsset
+}
+
+type EditionBurnedEvent {
+  id: ID!
+  timestamp: Time!
+  reason: String!
+}
+
+type EditionCreatedEvent {
+  id: ID!
+  timestamp: Time!
+  buyer: UserPublic!
+  pmSale: PrimaryMarketSale!
+}
+
+type EditionDepositedEvent {
+  id: ID!
+  timestamp: Time!
+  blockchainTransactionId: String!
+  blockchainSaleDetails: BlockchainSale!
+  fromAddress: String!
+  fromBlockchainAddress: EthereumAddress!
+  toPlatformOwner: UserPublic!
+}
+
+union EditionEvent = EditionOwnerChangedEvent | EditionMintedEvent | EditionTransferredOnChainEvent | EditionWithdrawnEvent | EditionDepositedEvent | EditionCreatedEvent | EditionBurnedEvent
+
+type EditionMintedEvent {
+  id: ID!
+  timestamp: Time!
+  blockchainTransactionId: String!
+}
+
+union EditionOwner = BlockchainAddressEditionOwner | UserEditionOwner
+
+type EditionOwnerChangedEvent {
+  id: ID!
+  timestamp: Time!
+  newOwner: UserPublic!
+  smSale: SecondaryMarketSale!
+}
+
+type EditionStats {
+  lastSalePrice: Amount
+  lastSaleTime: Time
+}
+
+enum EditionStatus {
+  NOT_MINTED
+  MINTING
+  ON_PLATFORM
+  WITHDRAWAL_REQUESTED
+  WITHDRAWING
+  WITHDRAWN
+  DEPOSIT_REQUESTED
+  BURNED
+}
+
+type EditionTransferredOnChainEvent {
+  id: ID!
+  timestamp: Time!
+  blockchainTransactionId: String!
+  blockchainSaleDetails: BlockchainSale!
+  fromAddress: String!
+  fromBlockchainAddress: EthereumAddress!
+  toAddress: String!
+  toBlockchainAddress: EthereumAddress!
+}
+
+type EditionUserInput {
+  key: String!
+  value: String!
+}
+
+type EditionWithdrawnEvent {
+  id: ID!
+  timestamp: Time!
+  blockchainTransactionId: String!
+  withdrawnToAddress: String!
+  withdrawnToBlockchainAddress: EthereumAddress!
+}
+
+type EthereumAddress implements BlockchainAddress {
+  address: String!
+  ensName: String
+}
+
+type Exhibition {
+  id: ExhibitionID!
+  slug: String!
+  name: String
+  subtitle: String
+  keyDetails: String
+  about: Markdown
+  cover: ImageAsset
+  contentBanner: StaticAsset
+  startDate: Time
+  endDate: Time
+  curators: [Person!]!
+  artists: [Person!]!
+  artworks: [Artwork!]!
+  collections: [Collection!]!
+  galleries: [Gallery!]!
+  content: [ExhibitionContent!]!
+  updatedAt: Time
+  links: [Link!]!
+  isHidden: Boolean!
+  tags: [String!]!
+}
+
+type ExhibitionAssetList {
+  assets: [StaticAsset!]!
+}
+
+type ExhibitionBanner {
+  asset: StaticAsset
+}
+
+type ExhibitionConnection {
+  totalCount: Int
+  pageInfo: PageInfo!
+  nodes: [Exhibition!]!
+}
+
+union ExhibitionContent = ExhibitionBanner | ExhibitionText | ExhibitionQuote | ExhibitionEmbed | ExhibitionAssetList | ExhibitionWorkList
+
+type ExhibitionEmbed {
+  src: String
+}
+
+scalar ExhibitionID
+
+type ExhibitionQuote {
+  contentValue: Markdown
+  caption: String
+}
+
+input ExhibitionsPageFilter {
+  ids: [ID!]
+  slugs: [String!]
+  showHidden: Boolean
+  search: String
+  containsTags: [String!]
+  notContainsTags: [String!]
+  personIds: [PersonID!]
+}
+
+input ExhibitionsPageRequest {
+  filter: ExhibitionsPageFilter
+  after: Cursor
+  first: Int! = 20
+}
+
+type ExhibitionText {
+  contentValue: Markdown
+}
+
+type ExhibitionWorkList {
+  collections: [Collection!]
+  artworks: [Artwork!]
+}
+
+input ExploreFilter {
+  exploreTab: [ExploreTabFilter!]
+  market: [ExploreFilterMarket!]
+  assetType: [ExploreFilterAssetType!]
+  artistIds: [PersonID!]
+  personIds: [PersonID!]
+  containsTags: [String!]
+  notContainsTags: [String!]
+}
+
+enum ExploreFilterAssetType {
+  IMAGE
+  VIDEO
+  OTHER
+}
+
+enum ExploreFilterMarket {
+  PRIMARY
+  SECONDARY
+}
+
+input ExploreSorting {
+  sort: ExploreSortOption!
+  direction: SortDirection!
+}
+
+enum ExploreSortOption {
+  LAST_SALE_TIME
+  RECENCY
+  ENDED_AT
+  FLOOR_PRICE
+  FEATURED_SCORE
+  UPCOMING
+}
+
+enum ExploreTabFilter {
+  LIVE
+  UPCOMING
+  OPEN
+  CLOSED
+  CLOSING_SOON
+}
+
+type ExtensionSettings {
+  extensionCutoff: Time
+  extendUpToMsec: Int!
+}
+
+enum ExternalMarket {
+  OPENSEA
+}
+
+type ExternalMarketFee {
+  amount: Amount!
+  feeType: ExternalMarketFeeType!
+}
+
+enum ExternalMarketFeeType {
+  MarketplaceFee
+  GasFee
+}
+
+union ExternalMarketOffer = OpenseaMarketOffer
+
+union ExternalMarketSale = OpenseaMarketSale
+
+enum ExternalSaleStatus {
+  PENDING
+  FAILED
+  SUCCESS
+}
+
+union Feature = StringFeature
+
+interface FeatureInterface {
+  name: String!
+  totalEntries: Int!
+}
+
+union FeatureValue = StringFeatureValue
+
+interface FeatureValueInterface {
+  name: String!
+  valueJson: String!
+}
+
+type FeeEstimation {
+  royaltyFee: Decimal!
+  royaltyAmount: Amount!
+  marketplaceFee: Decimal!
+  marketplaceAmount: Amount!
+  youWillReceive: Amount!
+}
+
+type Fees {
+  primaryMarket: PrimaryMarketFees!
+  secondaryMarket: SecondaryMarketFees!
+  assetFees: [AssetFees!]
+}
+
+type FiatWallet implements GenericWallet {
+  id: ID!
+  currency: String!
+  balance: Decimal!
+  availableBalance: Decimal!
+  audit: [WalletAuditEntry!]!
+}
+
+input GalleriesPageFilter {
+  ids: [ID!]
+  slugs: [String!]
+  search: String
+}
+
+input GalleriesPageRequest {
+  filter: GalleriesPageFilter
+  after: Cursor
+  first: Int! = 20
+}
+
+type Gallery {
+  id: GalleryID!
+  slug: String!
+  name: String
+  bio: Markdown
+  cover: ImageAsset
+  artists: [Person!]!
+  establishedAt: Time
+  updatedAt: Time
+}
+
+type GalleryConnection {
+  totalCount: Int
+  pageInfo: PageInfo!
+  nodes: [Gallery!]!
+}
+
+scalar GalleryID
+
+type GenerativeProjectArtworkKind {
+  iframeUrl: String!
+  aspectRatio: Float!
+  mintIframeUrl: String
+  previewGeneratorSettings: PreviewGeneratorSettings!
+  allowUserCuration: Boolean
+  showStaticPreview: Boolean
+}
+
+interface GenericWallet {
+  id: ID!
+  currency: String!
+  balance: Decimal!
+  availableBalance: Decimal!
+  audit: [WalletAuditEntry!]!
+}
+
+interface IExternalMarketOffer {
+  id: ID!
+  offer: SecondaryMarketOffer!
+  externalOrderId: String!
+  txHash: String
+  amount: Amount!
+  createdAt: Time!
+  updatedAt: Time!
+  endedAt: Time
+  validFrom: Time!
+  validTo: Time!
+  status: String!
+  endReason: String
+  sale: ExternalMarketSale!
+}
+
+interface IExternalMarketSale {
+  id: ID!
+  market: ExternalMarket!
+  order: Order!
+  edition: Edition!
+  artwork: Artwork!
+  amount: Amount!
+  status: ExternalSaleStatus!
+  createdAt: Time!
+  moneyHeldAt: Time
+  moneyChargedAt: Time
+  finishedAt: Time
+  failReason: String
+  meta: String
+}
+
+type IFrameAsset implements IStaticAsset {
+  id: StaticAssetID!
+  iframeUrl: String!
+  baseUrl: String!
+  previewS3Key: String!
+  previewImageUrl: String!
+  aspectRatio: Float
+  caption: String
+  internalTitle: String
+}
+
+type ImageAsset implements IStaticAsset {
+  id: StaticAssetID!
+  baseUrl: String!
+  s3Key: String
+  author: String
+  caption: String
+  aspectRatio: Float
+  width: Int
+  height: Int
+  mimeType: String
+  fileSize: Int
+  internalTitle: String
+  isGif: Boolean!
+}
+
+input InputAmount {
+  value: Decimal!
+  currency: String!
+}
+
+interface IOrderCharge {
+  id: ID!
+  currency: String
+  amount: Decimal
+  capturedAmount: Decimal
+  capturedAt: Time
+}
+
+interface IStaticAsset {
+  id: StaticAssetID!
+  baseUrl: String!
+  internalTitle: String
+}
+
+type Link {
+  id: LinkID!
+  title: String
+  excerpt: String
+  imageUrl: String
+  url: String
+  date: Time
+  personsIds: [PersonID!]!
+  persons: [Person!]!
+  categories: [LinkCategory!]!
+  imageAsset: ImageAsset
+}
+
+enum LinkCategory {
+  INTERVIEW
+  VIDEO
+  PODCAST
+  NEWS
+}
+
+type LinkConnection {
+  totalCount: Int
+  pageInfo: PageInfo!
+  nodes: [Link!]!
+}
+
+type LinkedWallet {
+  userId: ID!
+  address: String!
+  network: LinkedWalletNetwork!
+  isMintingWallet: Boolean!
+  linkedAt: Time!
+}
+
+enum LinkedWalletNetwork {
+  Ethereum
+  Solana
+  Bitcoin
+  Tezos
+}
+
+scalar LinkID
+
+input LinksPageFilter {
+  ids: [ID!]
+  search: String
+}
+
+input LinksPageRequest {
+  filter: LinksPageFilter
+  after: Cursor
+  first: Int! = 20
+}
+
+scalar Markdown
+
+enum Market {
+  PRIMARY
+  SECONDARY
+  OPENSEA
+}
+
+type MarketplaceOrder {
+  id: ID!
+  orderSide: MarketplaceOrderSide!
+  usdPrice: Decimal!
+  price: Amount!
+  source: String!
+  sourceOrderId: String!
+  createdAt: Time!
+  expiresAt: Time!
+  updatedAt: Time!
+  quantity: Decimal!
+  filledQuantity: Decimal!
+  chain: Chain!
+  artwork: Artwork
+  asset: Asset
+  collection: Collection
+  maker: UserOrBlockchainAddress!
+  externalOfferSender: UserPublic
+}
+
+type MarketplaceOrderConnection {
+  pageInfo: PageInfo!
+  nodes: [MarketplaceOrder!]!
+}
+
+input MarketplaceOrderFilter {
+  side: MarketplaceOrderSide!
+  asset: AssetInput
+  collectionId: String
+  artworkId: String
+  openseaSlug: String
+  token: MarketplaceOrderTokenFilter
+}
+
+enum MarketplaceOrderSide {
+  ASK
+  BID
+}
+
+input MarketplaceOrdersRequest {
+  filter: MarketplaceOrderFilter!
+  after: Cursor
+  first: Int = 20
+}
+
+input MarketplaceOrderTokenFilter {
+  contractAddress: String!
+  tokenId: String!
+}
+
+type MarketplaceStats {
+  period: MarketplaceStatsPeriod!
+  topArtworksByVolume(filter: StatsFilter): [ArtworkVolume!]!
+  topCollectionsByVolume(filter: StatsFilter): [CollectionVolume!]!
+  topSales(filter: StatsFilter): [StatsSale!]!
+}
+
+enum MarketplaceStatsPeriod {
+  PERIOD_1D
+  PERIOD_7D
+  PERIOD_30D
+  PERIOD_ALL_TIME
+}
+
+enum MintingOptionType {
+  DEFAULT
+  FAST
+}
+
+type MintPassConfiguration {
+  requiredArtworks: [Artwork!]!
+}
+
+type OpenseaListing {
+  id: String!
+  listingType: OpenseaListingType!
+  price: Amount!
+  startsAt: Time!
+  endsAt: Time!
+  edition: Edition!
+  artwork: Artwork!
+  chain: Chain!
+}
+
+enum OpenseaListingType {
+  BASIC
+  ENGLISH
+  DUTCH
+}
+
+type OpenseaMarketOffer implements IExternalMarketOffer {
+  id: ID!
+  offer: SecondaryMarketOffer!
+  externalOrderId: String!
+  txHash: String
+  amount: Amount!
+  usdAmount: Amount!
+  createdAt: Time!
+  updatedAt: Time!
+  endedAt: Time
+  validFrom: Time!
+  validTo: Time!
+  status: String!
+  endReason: String
+  sale: ExternalMarketSale!
+}
+
+type OpenseaMarketSale implements IExternalMarketSale {
+  id: ID!
+  market: ExternalMarket!
+  edition: Edition!
+  order: Order!
+  buyer: UserPublic
+  seller: UserPublic
+  artwork: Artwork!
+  amount: Amount!
+  status: ExternalSaleStatus!
+  transactionHash: String
+  createdAt: Time!
+  moneyHeldAt: Time
+  moneyChargedAt: Time
+  finishedAt: Time
+  failReason: String
+  meta: String
+  fees: [ExternalMarketFee!]
+}
+
+type Order {
+  id: ID!
+  sale: AuditSale
+  status: OrderStatus!
+  amounts: OrderAmounts!
+  audit: OrderAudit
+  paymentIdempotencyKey: Uint64!
+}
+
+type OrderAmounts {
+  total: Decimal!
+  pendingPayment: Decimal!
+  runningCharges: Int!
+}
+
+type OrderAudit {
+  status: String!
+  charges: [IOrderCharge!]
+  billingCountry: CountryIsoCode
+}
+
+type OrderChargeCrypto implements IOrderCharge {
+  id: ID!
+  txHash: String!
+  chain: String!
+  currency: String
+  amount: Decimal
+  capturedAmount: Decimal
+  capturedAt: Time
+}
+
+type OrderChargeStripe implements IOrderCharge {
+  id: ID!
+  paymentIntentId: String!
+  currency: String
+  amount: Decimal
+  capturedAmount: Decimal
+  capturedAt: Time
+}
+
+type OrderChargeSwitch implements IOrderCharge {
+  id: ID!
+  chargeId: String!
+  currency: String
+  amount: Decimal
+  capturedAmount: Decimal
+  capturedAt: Time
+}
+
+type OrderChargeUnknown implements IOrderCharge {
+  id: ID!
+  currency: String
+  amount: Decimal
+  capturedAmount: Decimal
+  capturedAt: Time
+}
+
+type OrderChargeWallet implements IOrderCharge {
+  id: ID!
+  wallet: Wallet!
+  currency: String
+  amount: Decimal
+  capturedAmount: Decimal
+  capturedAt: Time
+}
+
+type OrderChargeWechat implements IOrderCharge {
+  id: ID!
+  paymentIntentId: String!
+  currency: String
+  amount: Decimal
+  capturedAmount: Decimal
+  capturedAt: Time
+}
+
+scalar OrderStatus
+
+type PageInfo {
+  startCursor: Cursor
+  endCursor: Cursor
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+}
+
+type Person {
+  id: PersonID!
+  slug: String!
+  isArtist: Boolean!
+  isCurator: Boolean!
+  isGallery: Boolean!
+  name: String
+  bio: Markdown
+  twitterHandle: String
+  cover: ImageAsset
+  artworks: [Artwork!]!
+  collections: [Collection!]!
+  exhibitions: [Exhibition!]!
+  exhibitionsCurated: [Exhibition!]!
+  updatedAt: Time
+  links: [Link!]!
+  featuredArtwork: Artwork
+  profileLinks: [String!]!
+  tweets: [String!]!
+  categoriesTags: [String!]!
+  banner: ImageAsset
+  location: String
+  bioLine: String
+  birthYear: String
+  deathYear: String
+  relatedWallets: [RelatedWallet!]
+}
+
+type PersonConnection {
+  totalCount: Int
+  pageInfo: PageInfo!
+  nodes: [Person!]!
+}
+
+scalar PersonID
+
+enum PersonSort {
+  NAME
+  LASTNAME
+  UPDATED_AT
+}
+
+input PersonSorting {
+  sort: PersonSort!
+  direction: SortDirection!
+}
+
+input PersonsPageFilter {
+  ids: [ID!]
+  slugs: [String!]
+  showHidden: Boolean
+  personTypes: [PersonType!]
+  search: String
+  categoriesTags: [String!]
+}
+
+input PersonsPageRequest {
+  filter: PersonsPageFilter
+  sorting: PersonSorting
+  after: Cursor
+  first: Int! = 20
+}
+
+enum PersonType {
+  ARTIST
+  CURATOR
+  GALLERY
+  BOTH
+}
+
+type PMAuctionBracket {
+  from: Decimal!
+  step: Decimal!
+}
+
+type PMAuctionStats {
+  highestBid: PrimaryMarketBid
+  bidsCount: Int!
+}
+
+type PMAuctionStrategy {
+  pmListingId: ID!
+  minimumBid: Amount!
+  bids: [PrimaryMarketBid!]!
+  stats: PMAuctionStats!
+  auctionBrackets: [PMAuctionBracket!]
+  rankedAuctionSettings: RankedAuctionSettings
+  extensionSettings: ExtensionSettings
+  currentStep: Decimal
+  entryBid: Amount
+  myWinningBids: [PrimaryMarketBid!]!
+  leaders: [PrimaryMarketBid!]!
+  lowestWinningBid: PrimaryMarketBid
+}
+
+type PMBuyNowLimitedEditionStrategy {
+  pmListingId: ID!
+  price: Amount!
+  maxEditions: Int!
+  reservedEditions: Int!
+  stats: PMBuyNowStats!
+  dutchAuction: DutchAuctionSettings
+  decreasingSupply: DecreasingSupplySettings
+  purchaseQueue: PurchaseQueueStatus
+}
+
+type PMBuyNowOpenEditionStrategy {
+  pmListingId: ID!
+  price: Amount!
+  stats: PMBuyNowStats!
+  dutchAuction: DutchAuctionSettings
+}
+
+type PMBuyNowStats {
+  issuedEditions: Int!
+}
+
+enum PMListingEndReason {
+  TIME_IS_OUT
+  SOLD_OUT
+}
+
+type PossibleStringFeatureValue {
+  value: String!
+  numberOfEntries: Int!
+}
+
+enum PreviewGeneratorEngine {
+  LAMBDA
+  STANDALONE
+  GO_LAMBDA
+}
+
+enum PreviewGeneratorMode {
+  VIEWPORT
+  CANVAS
+}
+
+type PreviewGeneratorSettings {
+  previewTriggerType: PreviewTriggerType
+  delayMillis: Int
+  previewGeneratorMode: PreviewGeneratorMode
+  canvasSelector: String
+  deviceScaleFactor: Float
+  previewSize: Int
+  previewGeneratorEngine: PreviewGeneratorEngine!
+  timeoutMsec: Int
+}
+
+enum PreviewTriggerType {
+  DELAY
+  FN_TRIGGER
+}
+
+input PreviewUserInput {
+  key: String!
+  value: String!
+}
+
+type PrimaryMarketBid {
+  id: ID!
+  pmListing: PrimaryMarketListing!
+  amount: Amount!
+  maxAmount: Amount
+  bidder: UserPublic!
+  status: PrimaryMarketBidStatus!
+  isAbsentee: Boolean!
+  createdAt: Time!
+  moneyHeldAt: Time
+  moneyChargedAt: Time
+  finishedAt: Time
+  adjustedAt: Time
+  failReason: String
+  pmSale: PrimaryMarketSale
+}
+
+enum PrimaryMarketBidStatus {
+  PENDING
+  PLACED
+  OUTBID
+  WINNER
+  FAILED
+}
+
+type PrimaryMarketFees {
+  creatorIncome: [CreatorIncomeDefinition!]!
+}
+
+type PrimaryMarketListing {
+  id: ID!
+  artwork: Artwork!
+  strategy: PrimaryMarketStrategy!
+  createdAt: Time!
+  startedAt: Time
+  endedAt: Time
+  endReason: PMListingEndReason
+  startsAt: Time!
+  endsAt: Time!
+  pmSales: [PrimaryMarketSale!]!
+  editionTarget: Edition
+}
+
+type PrimaryMarketSale {
+  id: ID!
+  pmListing: PrimaryMarketListing!
+  order: Order!
+  editionId: ID
+  edition: Edition
+  buyerId: ID!
+  orderId: ID
+  status: PrimaryMarketSaleStatus!
+  amount: Amount!
+  createdAt: Time!
+  moneyHeldAt: Time
+  moneyChargedAt: Time
+  finishedAt: Time
+  failReason: String
+  fees: SaleFees
+  saleShippingAddress: ShippingAddress
+}
+
+enum PrimaryMarketSaleStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+union PrimaryMarketStrategy = PMBuyNowLimitedEditionStrategy | PMBuyNowOpenEditionStrategy | PMAuctionStrategy
+
+enum ProductChain {
+  NONE
+  ETHEREUM
+  TEZOS
+  BASE
+  SOLANA
+  PHYSICAL
+  BITCOIN
+}
+
+type ProjectArtworkKind {
+  items: [ProjectItem!]!
+  withRepetitions: Boolean!
+  allowUserSelection: Boolean!
+}
+
+type ProjectItem {
+  id: ID!
+  staticAssetId: StaticAssetID!
+  staticAsset: StaticAsset!
+  isAvailable: Boolean!
+  probability: Float
+  featuresJson: String
+}
+
+scalar ProtoAnyJSON
+
+union PurchaseQueuePosition = PurchaseQueuePositionInQueue | PurchaseQueuePositionPurchasing
+
+type PurchaseQueuePositionInQueue {
+  queueSlotId: String!
+  position: Int!
+}
+
+type PurchaseQueuePositionPurchasing {
+  queueSlotId: String!
+  expiresAt: Time!
+  purchaseToken: String!
+}
+
+type PurchaseQueueStatus {
+  queueId: ID!
+  myPosition: PurchaseQueuePosition
+  queueSize: Int!
+  activePurchases: Int!
+}
+
+type QuasiDragonsCompositeArtworkKind {
+  artworkId: String!
+  baseTileArtworkId: String!
+  compositeBuilderIframeUrl: String!
+  generatorIframeUrl: String!
+  previewGeneratorSettings: PreviewGeneratorSettings!
+  layouts: [QuasiDragonsLayout!]!
+}
+
+type QuasiDragonsLayout {
+  layoutName: String!
+  layoutType: QuasiDragonsLayoutType!
+  minted: Int!
+  dragonsMinted: Int!
+}
+
+enum QuasiDragonsLayoutType {
+  BLACK_DRAGON
+  WHITE_DRAGON
+}
+
+type RankedAuctionSettings {
+  topNWinners: Int!
+}
+
+type RelatedWallet {
+  wallet: BlockchainAddress!
+  relationType: WalletRelationType!
+}
+
+type SaleFeeAmount {
+  userId: String
+  percentage: String!
+  amount: Amount!
+  payouts: [SalePayout!]
+}
+
+type SaleFees {
+  userAmounts: [SaleFeeAmount!]!
+  marketplaceFee: SaleFeeAmount!
+  gasFee: SaleFeeAmount
+}
+
+type SalePayout {
+  chargeId: String!
+  amount: Amount!
+}
+
+type SavedUserInput {
+  key: String!
+  value: String!
+}
+
+input SearchParams {
+  includeHiddenCollections: Boolean! = false
+}
+
+type SearchResult {
+  artists: [Person!]!
+  artworks: [Artwork!]! @deprecated(reason: "use collections instead")
+  exhibitions: [Exhibition!]!
+  collections: [Collection!]!
+}
+
+type SecondaryMarketFees {
+  platformFee: Decimal!
+  creatorIncome: [CreatorIncomeDefinition!]!
+}
+
+type SecondaryMarketListing {
+  id: ID!
+  edition: Edition
+  asset: Asset!
+  artwork: Artwork!
+  isActive: Boolean!
+  offersStrategy: SMOfferStrategy!
+  additionalStrategies: [AdditionalSecondaryMarketStrategy!]!
+  owner: UserPublic!
+  smSale: SecondaryMarketSale
+  createdAt: Time!
+  endedAt: Time
+  listedAt: Time
+}
+
+type SecondaryMarketOffer {
+  id: ID!
+  isGlobal: Boolean!
+  isActive: Boolean!
+  smListing: SecondaryMarketListing
+  artwork: Artwork @deprecated(reason: "use artworks field")
+  artworks: [Artwork!]
+  asset: Asset
+  amount: Amount!
+  offerBy: UserPublic!
+  offerTo: UserPublic
+  criteria: SMOfferCriteria!
+  smSale: SecondaryMarketSale
+  createdAt: Time!
+  expiresAt: Time!
+  acceptedAt: Time
+  cancelledAt: Time
+  cancelReason: String
+  externalOffer: ExternalMarketOffer
+}
+
+type SecondaryMarketSale {
+  id: ID!
+  smListing: SecondaryMarketListing!
+  editionId: ID
+  asset: Asset!
+  buyerId: ID!
+  offerId: ID
+  amount: Amount!
+  status: SecondaryMarketSaleStatus!
+  createdAt: Time!
+  moneyHeldAt: Time
+  moneyChargedAt: Time
+  finishedAt: Time
+  failReason: String
+  fees: SaleFees
+}
+
+enum SecondaryMarketSaleStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+type ShippingAddress {
+  fullName: String!
+  address1: String!
+  address2: String!
+  city: String!
+  region: String!
+  postalCode: String!
+  country: String!
+  phoneNumber: String!
+  email: String!
+}
+
+type SMArtworkSellingOptions {
+  offer: SMOffersSellingOption
+}
+
+type SMBuyNowStrategy {
+  price: Amount!
+}
+
+type SMOfferCriteria {
+  artworkIds: [ID!]
+  smListingId: ID
+  asset: Asset
+}
+
+type SMOfferMatch {
+  id: String!
+  offer: SecondaryMarketOffer!
+  listing: SecondaryMarketListing!
+  artwork: Artwork!
+  active: Boolean!
+  matchedAt: Time!
+  unmatchedAt: Time
+}
+
+type SMOfferMatchConnection {
+  totalResults: Int!
+  pageInfo: PageInfo!
+  nodes: [SMOfferMatch!]!
+}
+
+input SMOfferMatchFilter {
+  fromUserId: [ID!]
+  toUserId: [ID!]
+  active: Boolean
+}
+
+input SMOfferMatchRequest {
+  first: Int! = 20
+  after: Cursor
+  filter: SMOfferMatchFilter
+}
+
+type SMOffersSellingOption {
+  minimumOffer: Amount!
+}
+
+type SMOfferStrategy {
+  isAvailable: Boolean!
+  minimumOffer: Amount!
+  activeOffers: [SecondaryMarketOffer!]!
+  listingId: ID!
+}
+
+type SolanaAddress implements BlockchainAddress {
+  address: String!
+}
+
+enum SortDirection {
+  ASC
+  DESC
+}
+
+union StaticAsset = VideoAsset | ImageAsset | SVGAsset | AudioAsset | IFrameAsset
+
+scalar StaticAssetID
+
+input StatsFilter {
+  tags: TagsFilter
+}
+
+type StatsSale {
+  id: ID!
+  asset: Asset!
+  artwork: Artwork!
+  collection: Collection
+  buyer: UserPublic
+  buyerBlockchainAddress: BlockchainAddress
+  market: Market!
+  amount: Amount!
+  timestamp: Time!
+  txHash: String
+}
+
+type StringFeature implements FeatureInterface {
+  name: String!
+  totalEntries: Int!
+  possibleValues: [PossibleStringFeatureValue!]
+}
+
+type StringFeatureValue implements FeatureValueInterface {
+  name: String!
+  value: String!
+  valueJson: String!
+}
+
+type SVGAsset implements IStaticAsset {
+  id: StaticAssetID!
+  baseUrl: String!
+  s3Key: String
+  previewS3Key: String!
+  previewImageUrl: String!
+  author: String
+  caption: String
+  previewAspectRatio: Float
+  mimeType: String
+  fileSize: Int
+  internalTitle: String
+}
+
+input TagsFilter {
+  include: [String!]
+  exclude: [String!]
+}
+
+type TezosAddress implements BlockchainAddress {
+  address: String!
+}
+
+scalar Time
+
+scalar Uint64
+
+type UserEditionOwner {
+  owner: UserPublic!
+}
+
+union UserOrBlockchainAddress = UserPublic | EthereumAddress | SolanaAddress | TezosAddress | BitcoinProductAddress
+
+type UserPublic {
+  id: ID!
+  editions: [Edition!]!
+  withdrawnEditions: [Edition!]!
+  username: String
+  bio: String
+  profilePic: String
+  profileBanner: String
+  twitterHandle: String
+  linkedWallets: [LinkedWallet!]!
+}
+
+type VideoAsset implements IStaticAsset {
+  id: StaticAssetID!
+  baseUrl: String!
+  s3Key: String
+  previewS3Key: String!
+  previewImageUrl: String!
+  author: String
+  caption: String
+  previewAspectRatio: Float
+  width: Int
+  height: Int
+  mimeType: String
+  fileSize: Int
+  internalTitle: String
+}
+
+union Wallet = FiatWallet | CryptoWallet
+
+type WalletAuditEntry {
+  kind: WalletAuditEntryKind
+  timestamp: Time!
+  amount: String!
+  order: Order
+  metadata: [ProtoAnyJSON]
+}
+
+enum WalletAuditEntryKind {
+  DEBIT
+  CREDIT
+  PAYOUT
+  PAY_WITH_WALLET
+  WITHDRAWAL
+}
+
+enum WalletRelationType {
+  ROYALTIES
+  CONTRACT_DEPLOYMENT
+  CONTRACT_OWNERSHIP
+}

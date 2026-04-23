@@ -1,0 +1,324 @@
+# ─── Activity & Marketplace Stats Queries ────────────────────────────────
+# Examples for querying the activity feed, marketplace statistics,
+# trending collections, and recent sales.
+
+# ── 1. Activity feed for a specific artwork ──────────────────────────────
+# Paginated activity feed filtered by artwork and activity types.
+
+query ArtworkActivity(
+  $artworkId: ID!
+  $first: Int!
+  $after: Cursor
+  $activityTypes: [ActivityEntryType!]
+) {
+  activityPage(
+    filter: {
+      artworkIds: [$artworkId]
+      activityType: $activityTypes
+    }
+    first: $first
+    after: $after
+  ) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    nodes {
+      id
+      entryType
+      timestamp
+      amount
+      transactionHash
+      fromUserId {
+        username
+      }
+      toUserId {
+        username
+      }
+      fromBlockchainAddress
+      toBlockchainAddress
+      edition {
+        id
+        editionNumber
+        title
+        staticAsset {
+          ... on ImageAsset {
+            baseUrl
+            aspectRatio
+          }
+        }
+      }
+      artwork {
+        id
+        title
+        artist {
+          name
+        }
+      }
+    }
+  }
+}
+
+# Example variables:
+# {
+#   "artworkId": "...",
+#   "first": 24,
+#   "activityTypes": ["PM_SALE", "SM_SALE", "SM_LISTED", "SM_DELISTED", "SM_OFFER", "OS_SALE"]
+# }
+
+# ── 2. Recent sales across the platform ──────────────────────────────────
+
+query RecentSales($first: Int!) {
+  activityPage(
+    filter: {
+      activityType: [PM_SALE, SM_SALE, OS_SALE]
+    }
+    first: $first
+  ) {
+    nodes {
+      id
+      entryType
+      timestamp
+      amount
+      edition {
+        id
+        editionNumber
+        title
+        artwork {
+          id
+          title
+          blockchain
+          artist {
+            name
+          }
+          collection {
+            slug
+            name
+          }
+        }
+        staticAsset {
+          ... on ImageAsset {
+            baseUrl
+            aspectRatio
+          }
+          ... on VideoAsset {
+            previewImageUrl
+          }
+        }
+      }
+      artwork {
+        id
+        title
+        stats {
+          issuedEditions
+        }
+        cover {
+          ... on ImageAsset {
+            baseUrl
+            aspectRatio
+          }
+        }
+        primaryMarketListing {
+          startsAt
+          endsAt
+          strategy {
+            __typename
+          }
+        }
+      }
+    }
+  }
+}
+
+# ── 3. Activity feed for a specific user ─────────────────────────────────
+
+query UserActivity($userId: ID!, $first: Int!, $after: Cursor) {
+  activityPage(
+    filter: {
+      userId: $userId
+      activityType: [PM_SALE, SM_SALE, SM_LISTED, SM_OFFER, OS_SALE]
+    }
+    first: $first
+    after: $after
+  ) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    nodes {
+      id
+      entryType
+      timestamp
+      amount
+      edition {
+        id
+        editionNumber
+        title
+      }
+      artwork {
+        id
+        title
+        artist {
+          name
+        }
+      }
+      fromUserId {
+        username
+      }
+      toUserId {
+        username
+      }
+    }
+  }
+}
+
+# ── 4. Activity filtered by wallet addresses ─────────────────────────────
+
+query WalletActivity($addresses: [String!]!, $first: Int!, $after: Cursor) {
+  activityPage(
+    filter: {
+      addresses: $addresses
+      activityType: [SM_SALE, OS_SALE, SM_LISTED, SM_DELISTED]
+    }
+    first: $first
+    after: $after
+  ) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    nodes {
+      id
+      entryType
+      timestamp
+      amount
+      transactionHash
+      fromBlockchainAddress
+      toBlockchainAddress
+      edition {
+        id
+        editionNumber
+        tokenId
+        contractInfo {
+          contractAddress
+          chain
+        }
+      }
+      artwork {
+        id
+        title
+      }
+    }
+  }
+}
+
+# ── 5. Artwork stats with floor price history ────────────────────────────
+
+query ArtworkMarketData($artworkId: ID!) {
+  artworksPage(request: { filter: { ids: [$artworkId] }, first: 1 }) {
+    nodes {
+      id
+      title
+      stats {
+        issuedEditions
+        ownersCount
+        floorPrice {
+          value
+          currency
+        }
+        tradedVolume {
+          value
+          currency
+        }
+        lastSaleTime
+        lastSalePrice {
+          value
+          currency
+        }
+        highestSalePrice {
+          value
+          currency
+        }
+        listedItems
+        floorPriceForPeriod(period: PERIOD_7D) {
+          value
+          currency
+        }
+      }
+      floorListing {
+        id
+        price {
+          value
+          currency
+        }
+      }
+      bestOffer {
+        id
+        price {
+          value
+          currency
+        }
+      }
+      highestGlobalOffer {
+        id
+        amount {
+          value
+          currency
+        }
+        expiresAt
+      }
+    }
+  }
+}
+
+# ── 6. Collection stats and secondary market overview ────────────────────
+
+query CollectionMarketOverview($slug: String!) {
+  collectionsPage(request: { filter: { slugs: [$slug] }, first: 1 }) {
+    nodes {
+      id
+      name
+      slug
+      stats {
+        issuedEditions
+        ownersCount
+        floorPrice {
+          value
+          currency
+        }
+        tradedVolume {
+          value
+          currency
+        }
+        lastSaleTime
+        lastSalePrice {
+          value
+          currency
+        }
+        highestSalePrice {
+          value
+          currency
+        }
+        listedItems
+        floorPriceForPeriod(period: PERIOD_7D) {
+          value
+          currency
+        }
+      }
+      floorListing {
+        id
+        price {
+          value
+          currency
+        }
+      }
+      bestOffer {
+        id
+        price {
+          value
+          currency
+        }
+      }
+    }
+  }
+}
