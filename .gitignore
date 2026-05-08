@@ -9,3 +9,5 @@ public/*.js
 public/*.js.map
 
 .idea
+
+local

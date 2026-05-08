@@ -12,14 +12,15 @@
     "dist"
   ],
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --outfile=dist/verse-embedded.js --minify --sourcemap && cp dist/verse-embedded.js dist/verse-embedded.js.map public/",
-    "dev": "esbuild src/index.ts --bundle --outfile=dist/verse-embedded.js --sourcemap --watch & esbuild src/index.ts --bundle --outfile=public/verse-embedded.js --sourcemap --watch",
+    "build": "esbuild src/index.ts --bundle --outfile=dist/verse-embedded.js --minify --sourcemap && esbuild src/elements.ts --bundle --outfile=dist/verse-elements.js --minify --sourcemap && cp dist/verse-embedded.js dist/verse-embedded.js.map dist/verse-elements.js dist/verse-elements.js.map public/",
+    "dev": "esbuild src/index.ts --bundle --outfile=dist/verse-embedded.js --sourcemap --watch & esbuild src/index.ts --bundle --outfile=public/verse-embedded.js --sourcemap --watch & esbuild src/elements.ts --bundle --outfile=dist/verse-elements.js --sourcemap --watch & esbuild src/elements.ts --bundle --outfile=public/verse-elements.js --sourcemap --watch",
     "serve": "next dev --port 3001 --experimental-https --turbopack",
     "type-check": "tsc --noEmit",
     "prepare": "husky"
   },
   "dependencies": {
     "next": "^16.0.10",
+    "penpal": "^7.0.6",
     "react": "^19.2.3",
     "react-dom": "^19.2.3"
   },

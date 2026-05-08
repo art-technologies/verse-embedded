@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Title</title>
+    <script src="http://localhost:3001/public/verse-elements.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/codemirror.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/javascript/javascript.min.js"></script>
+
+    <style>
+      iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+
+      body {
+        background: lavenderblush;
+      }
+
+      button {
+        width: 100px;
+        height: 50px;
+      }
+
+      .visible {
+        display: block !important;
+      }
+
+      .json-editor-wrapper label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .json-editor-wrapper .CodeMirror {
+        height: 300px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      .json-editor-wrapper .json-error {
+        color: red;
+        font-size: 12px;
+        margin-top: 4px;
+        min-height: 16px;
+      }
+    </style>
+  </head>
+  <body style="background: lavenderblush">
+    <h2>Verse Elements: User Input Example</h2>
+    <div style="border: 1px solid black; padding: 8px; margin-bottom: 8px">
+      <h3>Authentication</h3>
+      <div class="auth-status-wrapper">
+        Auth status: <span class="auth-status">Loading...</span>
+      </div>
+      <div style="display: flex; gap: 10px">
+        <button disabled class="button-signin">Sign in</button>
+        <button disabled class="button-signout">Sign out</button>
+      </div>
+    </div>
+
+    <div style="border: 1px solid black; padding: 8px; margin-bottom: 8px">
+      <h3>Bookmark</h3>
+      <button disabled class="button-generate-bookmark" style="width: 200px">
+        Generate bookmark
+      </button>
+      <div class="bookmark-status">Not generated</div>
+    </div>
+
+    <div
+      style="border: 1px solid black; padding: 8px; margin-bottom: 8px"
+      class="json-editor-wrapper"
+    >
+      <h3>User Input (JSON)</h3>
+      <textarea id="json-editor"></textarea>
+      <div class="json-error" id="json-error"></div>
+    </div>
+
+    <div style="border: 1px solid black; padding: 8px">
+      <h3>Purchase</h3>
+      <button disabled class="button-buynow" style="width: 200px">
+        Invoke purchase dialog
+      </button>
+      <div class="purchase-result"></div>
+    </div>
+
+    <script>
+      const ARTWORK_ID =
+        new URLSearchParams(window.location.search).get("artworkId") ||
+        "0efab88c-7e13-436a-8fef-848b9e42a777";
+
+      let bookmarkState = null;
+
+      const BASE_URL =
+        new URLSearchParams(window.location.search).get("origin") ||
+        "https://iframe.verse.works";
+
+      const elements = new VerseElements({ baseUrl: BASE_URL });
+      const authStatusSpan = document.querySelector(".auth-status");
+      const buttonSignIn = document.querySelector(".button-signin");
+      const buttonSignOut = document.querySelector(".button-signout");
+      const buttonBuynow = document.querySelector(".button-buynow");
+      const buttonGenerateBookmark = document.querySelector(
+        ".button-generate-bookmark",
+      );
+      const bookmarkStatus = document.querySelector(".bookmark-status");
+      const purchaseResult = document.querySelector(".purchase-result");
+      const jsonError = document.getElementById("json-error");
+
+      async function checkAuthStatus() {
+        const isSignedIn = await elements.checkAuth();
+
+        if (isSignedIn) {
+          authStatusSpan.innerText = "Authenticated";
+          buttonSignIn.disabled = true;
+          buttonSignOut.disabled = false;
+          buttonBuynow.disabled = false;
+          buttonGenerateBookmark.disabled = false;
+        } else {
+          authStatusSpan.innerText = "Not authenticated";
+          buttonSignIn.disabled = false;
+          buttonSignOut.disabled = true;
+          buttonBuynow.disabled = true;
+          buttonGenerateBookmark.disabled = true;
+        }
+      }
+
+      buttonSignIn.addEventListener("click", function () {
+        elements.authorise().then(() => {
+          checkAuthStatus();
+        });
+      });
+
+      buttonSignOut.addEventListener("click", function () {
+        elements.signOut().then(() => {
+          checkAuthStatus();
+        });
+      });
+
+      buttonGenerateBookmark.addEventListener("click", function () {
+        bookmarkStatus.innerText = "Generating...";
+        elements.createBookmark(ARTWORK_ID).then((result) => {
+          bookmarkState = result;
+          bookmarkStatus.innerText = JSON.stringify(result);
+        });
+      });
+
+      checkAuthStatus();
+
+      // JSON editor
+      window.userInput = [{ key: "some_key", value: "some_value" }];
+      const editor = CodeMirror.fromTextArea(
+        document.getElementById("json-editor"),
+        {
+          mode: { name: "javascript", json: true },
+          lineNumbers: true,
+          matchBrackets: true,
+          tabSize: 2,
+        },
+      );
+      editor.setValue(JSON.stringify(window.userInput, null, 2));
+
+      editor.on("change", function () {
+        try {
+          window.userInput = JSON.parse(editor.getValue());
+          jsonError.textContent = "";
+        } catch (e) {
+          jsonError.textContent = "Invalid JSON: " + e.message;
+        }
+      });
+
+      buttonBuynow.addEventListener("click", function () {
+        purchaseResult.innerText = "Purchase in progress...";
+
+        elements.openPurchaseDialog(
+          ARTWORK_ID,
+          {
+            amount: {
+              currency: "USD",
+              value: "100",
+            },
+            userInput: [
+              ...(bookmarkState
+                ? [{ key: "$user_hash", value: bookmarkState.signedToken }]
+                : []),
+              ...window.userInput,
+            ],
+          },
+          {
+            onSuccess({ editionId, editionNumber, artworkId }) {
+              purchaseResult.innerText = `Purchase successful: ${JSON.stringify({ editionId, editionNumber, artworkId })}`;
+            },
+            onTerminalFailure({ title, message }) {
+              alert(`Error ${title}: ${message}`);
+            },
+            onClose() {
+              console.warn("User closed dialog");
+            },
+          },
+        );
+      });
+    </script>
+  </body>
+</html>
