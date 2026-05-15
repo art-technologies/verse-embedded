@@ -1,6 +1,6 @@
 {
   "name": "verse-embedded",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Lightweight library for embedding Verse artwork iframes",
   "repository": {
     "type": "git",
