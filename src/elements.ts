@@ -79,6 +79,10 @@ export interface VerseAuthResult {
   verseUsername?: string;
 }
 
+export interface AuthoriseOptions {
+  mode?: "signin" | "signup";
+}
+
 interface ParentMethods extends Methods {
   onAuthSuccess(data: VerseAuthResult): void;
 }
@@ -159,7 +163,10 @@ class VerseElements {
     }
   }
 
-  public authorise(): Promise<VerseAuthResult | null> {
+  public authorise(options?: AuthoriseOptions): Promise<VerseAuthResult | null> {
+    const mode = options?.mode ?? "signin";
+    const page = mode === "signup" ? "/signup" : "/signin";
+
     return new Promise((resolve) => {
       const overlay = document.createElement("div");
       Object.assign(overlay.style, {
@@ -191,7 +198,7 @@ class VerseElements {
 
       const iframe = document.createElement("iframe");
       const parentOrigin = encodeURIComponent(window.location.origin);
-      iframe.src = `${this.baseUrl}/signin?app_auth_host=${parentOrigin}`;
+      iframe.src = `${this.baseUrl}${page}?app_auth_host=${parentOrigin}`;
       Object.assign(iframe.style, {
         position: "relative",
         inset: "auto",
