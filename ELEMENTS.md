@@ -43,9 +43,15 @@ const isSignedIn = await elements.checkAuth();
 
 ---
 
-### `authorise()`
+### `authorise(options?)`
 
-Opens a sign-in dialog overlay. The user can close the dialog without signing in.
+Opens a sign-in or sign-up dialog overlay. The user can close the dialog without completing authentication.
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+| --------- | ---- | ------- | ----------- |
+| `options.mode` | `"signin" \| "signup"` | `"signin"` | Which authentication page to show |
 
 **Returns:** `Promise<VerseAuthResult | null>` — returns `null` if the user closes the dialog.
 
@@ -59,9 +65,16 @@ Opens a sign-in dialog overlay. The user can close the dialog without signing in
 ```
 
 ```javascript
+// Open sign-in (default)
 const result = await elements.authorise();
 if (result) {
   console.log("Signed in as", result.verseUsername);
+}
+
+// Open sign-up
+const result = await elements.authorise({ mode: "signup" });
+if (result) {
+  console.log("Signed up as", result.verseUsername);
 }
 ```
 
